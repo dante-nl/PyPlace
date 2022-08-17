@@ -1,0 +1,12 @@
+{
+	"apps": {
+		"PyPlace Quickstart": {
+			"name": "PyPlace Quickstart",
+			"url": "https://pyplace.dantenl.tk/experiments/quickstart.py"
+		},
+		"PyPlace - Bulk Delete": {
+			"name": "PyPlace - Bulk Delete",
+			"url": "https://pyplace.dantenl.tk/experiments/pyplace-bd-latest.py"
+		}
+	}
+}
