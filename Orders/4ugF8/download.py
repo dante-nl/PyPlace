@@ -64,13 +64,13 @@ DoINeedToRun = True
 ReplitMode = False
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
-# Default: 0.6 (changes every version)
+# Default: 0.7 (changes every version)
 # Possible options: any number
 
 # This is the version of PyPlace and is
 # absolutely not recommended to change,
 # except for testing purposes.
-Version = 0.6
+Version = 0.8
 
 
 # ————————————————————————————
@@ -121,9 +121,17 @@ def log(message):
 	if DoNotLogOutput == False:
 		print(f"{bcolors.LOG}Log:{bcolors.END} {message}")
 
+
+def error(error_msg):
+	print(f"{bcolors.FAIL}Error:{bcolors.END} {error_msg}")
+
+
+def info(info_msg):
+	print(f"{bcolors.INFO}{info_msg}{bcolors.END}")
+
 def UpdateCheck():
 	log("Checking for latest version...")
-	response = requests.get("https://cdn.dantenl.tk/PyPlace/version.json")
+	response = requests.get("https://pyplace.dantenl.tk/version.json")
 	if response.status_code != 200:
 		print(f"{bcolors.FAIL}Error:{bcolors.END} Could not check for updates! Response code: {response.status_code}")
 		return
@@ -153,7 +161,7 @@ def UpdateCheck():
 					f"{bcolors.INFO}Downloading latest version of PyPlace...{bcolors.END}")
 				log("Retrieving latest version of PyPlace...")
 				r = requests.get(
-					"https://cdn.dantenl.tk/PyPlace/PyPlace-Latest.py", allow_redirects=True)
+					"https://pyplace.dantenl.tk/PyPlace-Latest.py", allow_redirects=True)
 				if not r.ok:
 					print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
 					return
@@ -335,7 +343,7 @@ URLToPythonFile)
 			else:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} That does not appear to be a valid URL!")
 		elif Answer4 == "2":
-			StoreRequest = requests.get("https://cdn.dantenl.tk/pyplace/store.json", allow_redirects=False)
+			StoreRequest = requests.get("https://pyplace.dantenl.tk/store.json", allow_redirects=False)
 			if not StoreRequest.ok:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace store! Response code: {StoreRequest.status_code}")
 				return
@@ -430,7 +438,7 @@ URLToPythonFile)
 		elif Answer4 == "3":
 
 			ExperimentRequest = requests.get(
-				"https://cdn.dantenl.tk/pyplace/experiments.json", allow_redirects=True)
+				"https://pyplace.dantenl.tk/experiments.json", allow_redirects=True)
 			if not ExperimentRequest.ok:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace Experiment Store! Response code: {ExperimentRequest.status_code}")
 				return
@@ -538,63 +546,31 @@ def Settings():
 			log("Reading applications.json...")
 			print(f"{bcolors.WARNING}■{bcolors.END}: Experimental application")
 			print(f"{bcolors.OKCYAN}■{bcolors.END}: Application downloaded from the PyPlace store")
+			print()
 
-			ItemCount = 0
-			for item in json_data["apps"]:
-				ItemCount += 1
-				if "StoreApp" in json_data['apps'][item]:
-					if "StoreApp" in json_data['apps'][item]:
-						if json_data['apps'][item]["StoreApp"] == "true":
-							print(f"{bcolors.OKCYAN}[{ItemCount}] {json_data['apps'][item]['name']} by {json_data['apps'][item]['author']}{bcolors.END}")
-				elif "experiment" in json_data['apps'][item]:
-					if json_data['apps'][item]["experiment"] == "true":
-						print(f"{bcolors.WARNING}[{ItemCount}] {json_data['apps'][item]['name']}{bcolors.END}")
-				else:
-					if "author" in json_data['apps'][item]:
-						print(f"[{ItemCount}] {json_data['apps'][item]['name']} by {json_data['apps'][item]['author']}")
-					else:
-						print(f"[{ItemCount}] {json_data['apps'][item]['name']}")
-			
-			print(f"[{bcolors.INFO}i{bcolors.END}] Looking to delete multiple apps at once? Enter \"i\"")
-	
-			if ItemCount == 0:
-				print(f"{bcolors.FAIL}Error:{bcolors.END} You do not have any applications installed! You can download them via \"Download a PyPlace app\" on the main menu.")
+			num_app = 0
+			for item in AppDict["apps"]:
+				num_app += 1
+				if "StoreApp" in AppDict["apps"][item]:
+					if AppDict["apps"][item]["StoreApp"] == "true":
+						print(f"{bcolors.OKCYAN}[{num_app}] {AppDict['apps'][item]['name']}{bcolors.END}")
+				elif "experiment" in AppDict["apps"][item]:
+					if AppDict["apps"][item]["experiment"] == "true":
+						print(f"{bcolors.WARNING}[{num_app}] {AppDict['apps'][item]['name']}{bcolors.END}")
+
+
+			if num_app == 0:
+				error("You do not have any applications installed! You can download them via \"Download a PyPlace app\" on the main menu.")
 				return
 
 			print(f"[{bcolors.FAIL}c{bcolors.END}] Cancel")
-			NumberAppNeeded = input("What number app do you want to delete? ")
-			if NumberAppNeeded.lower() == "c":
-				NotAnswered = False
+
+			input = input("What apps do you want to delete? (seperated by a comma and a space, so for applications 1, 2 and 3 you would enter 1, 2, 3) ")
+			if input.lower() == "c":
 				return
-			elif NumberAppNeeded.lower() == "i":
-				print(f"""{bcolors.INFO}{bcolors.BOLD}Looking to delete multiple apps at once?{bcolors.END}
+			input = input.split(", ")
+			bulk_delete(input)
 
-You can download \"PyPlace - Bulk Delete\" fron the PyPlace Experiment Store right now.
-Just enter \"2\" at the home screen (for \"Download a PyPlace app\"), and then enter \"3\"
-to open the PyPlace Expirements Store!
-
-{bcolors.WARNING}NOTE:{bcolors.END} This is currently in beta, and things might not work properly.
-""")
-				input("Press [ENTER] to return to the home menu. ")
-				NotAnswered = False
-				return
-			ItemCount = 0
-			for item in json_data["apps"]:
-				ItemCount += 1
-				if str(ItemCount) == str(NumberAppNeeded):
-					ItemNeeded = item
-					AppName = json_data["apps"][item]["name"]
-
-			if exists(json_data["apps"][ItemNeeded]["file_name"]):
-				os.remove(json_data["apps"][ItemNeeded]["file_name"])
-				log(f"Deleted {json_data['apps'][ItemNeeded]['file_name']}")
-			del json_data["apps"][ItemNeeded]
-
-			with open('applications.json', 'w') as data_file:
-				data = json.dump(json_data, data_file,
-								indent=4,
-								separators=(',', ': '))
-			print(f"{bcolors.OKGREEN}Deleted {AppName}!{bcolors.END}")
 			NotAnswered = False
 
 		elif Answer == "2":
@@ -630,7 +606,7 @@ to open the PyPlace Expirements Store!
 						print(f"{bcolors.INFO}Downloading latest version of PyPlace...{bcolors.END}")
 						log("Retrieving latest version of PyPlace...")
 						r = requests.get(
-							"https://cdn.dantenl.tk/PyPlace/PyPlace-Latest.py", allow_redirects=True)
+							"https://pyplace.dantenl.tk/PyPlace-Latest.py", allow_redirects=True)
 						if not r.ok:
 							print(
 								f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
@@ -689,6 +665,33 @@ be as easy to use, so everyone can use it! :D
 		else:
 			print(f"{bcolors.FAIL}Error:{bcolors.END} I'm not sure what you mean with \"{Answer}\".")
 
+def bulk_delete(nums):
+	if exists("applications.json") == False:
+		error("You do not have any applications installed.")
+		return "Error"
+	items = len(nums)
+	info(f"Deleting {items} apps...")
+	RightApps = []
+	for number in nums:
+		current_num_app_dict = 0
+		for app in AppDict["apps"]:
+			current_num_app_dict += 1
+			if str(current_num_app_dict) == str(number):
+				RightApps.append(app)
+
+	for RightApp in RightApps:
+		if exists(AppDict["apps"][RightApp]["file_name"]):
+			os.remove(AppDict["apps"][RightApp]["file_name"])
+		del AppDict["apps"][RightApp]
+		with open('applications.json', 'w') as data_file:
+				data = json.dump(AppDict, data_file,
+									indent=4,
+									separators=(',', ': '))
+	if items == 0:
+		print(f"{bcolors.INFO}No apps to be deleted.{bcolors.END}")
+	else:
+		print(f"{bcolors.OKGREEN}Deleted {items} app(s)!{bcolors.END}")
+
 
 				
 
@@ -721,7 +724,7 @@ def PyPlaceRegular():
 			sys.exit(0)
 		else:
 			if Answer3.lower().startswith("-install"):
-				order_name = Answer3.lower().replace("-install", "")
+				order_name = Answer3.lower().replace("-install ", "")
 				log("Looking up order...")
 				response = requests.get(f"https://pyplace.dantenl.tk/orders/{order_name}/manifest.json")
 				if response.status_code == 404:
@@ -750,7 +753,7 @@ def PyPlaceRegular():
 					print(f"{bcolors.FAIL}Error:{bcolors.END} Invalid order.")
 					return
 				try:
-					if data["min-version"] > Version:
+					if float(data["min-version"]) > Version:
 						print(f"{bcolors.FAIL}Error:{bcolors.END} Your current PyPlace version is unable to read this overwrite. Please update it and try again.")
 						return
 				except KeyError:
