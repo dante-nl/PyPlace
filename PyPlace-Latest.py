@@ -64,13 +64,13 @@ DoINeedToRun = True
 ReplitMode = False
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
-# Default: 0.6 (changes every version)
+# Default: 0.7 (changes every version)
 # Possible options: any number
 
 # This is the version of PyPlace and is
 # absolutely not recommended to change,
 # except for testing purposes.
-Version = 0.6
+Version = 0.7
 
 
 # ————————————————————————————
@@ -720,8 +720,84 @@ def PyPlaceRegular():
 			NotAnswered3 = False
 			sys.exit(0)
 		else:
-			print(
-				f"{bcolors.FAIL}Error:{bcolors.END} I'm not sure what you mean with \"{Answer3}\".")
+			if Answer3.lower().startswith("-install"):
+				order_name = Answer3.lower().replace("-install ", "")
+				log("Looking up order...")
+				response = requests.get(f"https://pyplace.dantenl.tk/orders/{order_name}/manifest.json")
+				if response.status_code == 404:
+					print(f"{bcolors.FAIL}Error:{bcolors.END} That order does not exist.")
+					return
+				if response.status_code != 200:
+					print(f"{bcolors.FAIL}Error:{bcolors.END} Could not look that order up! Response code: {response.status_code}")
+					return
+
+				RequestText = response.text
+				data = json.loads(RequestText)
+
+				try:
+					data["name"]
+				except KeyError:
+					print(f"{bcolors.FAIL}Error:{bcolors.END} Invalid order.")
+					return
+				try:
+					data["description"]
+				except KeyError:
+					print(f"{bcolors.FAIL}Error:{bcolors.END} Invalid order.")
+					return
+				try:
+					data["type"]
+				except KeyError:
+					print(f"{bcolors.FAIL}Error:{bcolors.END} Invalid order.")
+					return
+				try:
+					if float(data["min-version"]) > Version:
+						print(f"{bcolors.FAIL}Error:{bcolors.END} Your current PyPlace version is unable to read this overwrite. Please update it and try again.")
+						return
+				except KeyError:
+					print(f"{bcolors.FAIL}Error:{bcolors.END} Invalid order.")
+					return
+				try:
+					data["downloads"][0]
+				except KeyError:
+					print(f"{bcolors.FAIL}Error:{bcolors.END} Invalid order.")
+					return
+				try:
+					if data["expired"] == True:
+						print(f"{bcolors.FAIL}Error:{bcolors.END} This order is no longer valid.")
+						return
+				except KeyError:
+					pass
+
+				print()
+				print(f"{bcolors.BOLD}Incoming Order!{bcolors.END}")
+				print("You have received an Order to test out something new!")
+				print(f"{bcolors.BOLD}Name:{bcolors.END} {data['name']}")
+				print(f"{bcolors.BOLD}Description:{bcolors.END} {data['description']}")
+				print(f"{bcolors.BOLD}Type:{bcolors.END} {data['type']}")
+				waiting = True
+				while waiting == True:
+					answer = input("Would you like to install this Order? (y/n) ").lower()
+					if answer == "y":
+						waiting = False
+						print(f"{bcolors.INFO}Downloading Order...{bcolors.END}")
+						r = requests.get(data["downloads"][0], allow_redirects=True)
+						if not r.ok:
+							print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
+							return
+						print(f"{bcolors.OKGREEN}The Order has been downloaded!")
+						print(f"{bcolors.OKCYAN}Installing the Order{bcolors.END}")
+						open('PyPlace.py', 'wb').write(r.content)
+						print(f"{bcolors.OKGREEN}The Order has been downloaded and installed in {bcolors.BOLD}PyPlace.py!{bcolors.END}")
+						print(f"{bcolors.INFO}Attempting to run PyPlace.py...{bcolors.END}")
+						os.system(f"{PyCommand} PyPlace.py")
+						sys.exit(1)
+					elif answer == "n":
+						waiting = False
+						return
+
+			else:
+				print(
+					f"{bcolors.FAIL}Error:{bcolors.END} I'm not sure what you mean with \"{Answer3}\".")
 
 
 print("————————————————————————————")
