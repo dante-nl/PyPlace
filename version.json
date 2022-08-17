@@ -1,4 +1,4 @@
 {
-	"version": 0.6,
+	"version": 0.7,
 	"release_notes": "- Moved from cdn.dantenl.tk to pyplace.dantenl.tk. All old links will continue to work. \n- Added support for Orders which can override your PyPlace file"
 }
