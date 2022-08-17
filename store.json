@@ -1,0 +1,49 @@
+{
+	"apps": {
+		"Simple Password Gen": {
+			"name": "Simple Password Generator",
+			"url": "https://pyplace.dantenl.tk/store%20files/password-gen.py",
+			"author": "dante_nl"
+		},
+		"Rock, paper, scissors": {
+			"name": "Rock, paper, scissors",
+			"url": "https://pyplace.dantenl.tk/store%20files/rps.py",
+			"author": "dante_nl"
+		},
+		"routinehub.py": {
+			"name": "routinehub.py — RoutineHub in Python",
+			"url": "https://routinehubpy.dantenl.tk/routinehub.py",
+			"author": "dante_nl"
+		},
+		"Hangman": {
+			"name": "Hangman",
+			"url": "https://pyplace.dantenl.tk/store%20files/hangman.py",
+			"author": "dante_nl"
+		},
+		"Caesar Cipher Installer": {
+			"name": "Caesar Cipher (installer)",
+			"url": "https://pyplace.dantenl.tk/store%20files/CaesarCipherInstaller.py",
+			"author": "dante_nl"
+		},
+		"Calculator": {
+			"name": "Simple Calculator",
+			"url": "https://pyplace.dantenl.tk/store%20files/calculator.py",
+			"author": "dante_nl"
+		},
+		"dictiona.py": {
+			"name": "dictiona.py — a dictionary in Python",
+			"url": "https://pyplace.dantenl.tk/store%20files/dictiona.py",
+			"author": "dante_nl"
+		},
+		"Guess the number": {
+			"name": "Guess the number",
+			"url": "https://pyplace.dantenl.tk/store%20files/guess-the-number.py",
+			"author": "dante_nl"
+		},
+		"Higher - Lower": {
+			"name": "Higher - Lower (installer)",
+			"url": "https://pyplace.dantenl.tk/store%20files/higherlowerinstaller.py",
+			"author": "dante_nl"
+		}
+	}
+}
