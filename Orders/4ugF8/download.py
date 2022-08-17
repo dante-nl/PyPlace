@@ -565,10 +565,10 @@ def Settings():
 
 			print(f"[{bcolors.FAIL}c{bcolors.END}] Cancel")
 
-			input = input("What apps do you want to delete? (seperated by a comma and a space, so for applications 1, 2 and 3 you would enter 1, 2, 3) ")
+			input_ = input("What apps do you want to delete? (seperated by a comma and a space, so for applications 1, 2 and 3 you would enter 1, 2, 3) ")
 			if input.lower() == "c":
 				return
-			input = input.split(", ")
+			input_ = input.split(", ")
 			bulk_delete(input)
 
 			NotAnswered = False
