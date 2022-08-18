@@ -1,0 +1,10 @@
+{
+	"name": "PyPlace Manual App Adding",
+	"description": "This allows you to add local Python files.",
+	"type": "overwrite",
+	"min-version": "0.7",
+	"expired": false,
+	"downloads": [
+		"https://pyplace.dantenl.tk/orders/gYvGA/download.py"
+	]
+}
