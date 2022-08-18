@@ -519,7 +519,7 @@ URLToPythonFile)
 			if FileExtensionCheck3 != ".py":
 				print(f"{bcolors.FAIL}Error:{bcolors.END} This is not a Python file, and thus can not be added to PyPlace.")
 				return
-			Name = input("What would you like to call it?")
+			Name = input("What would you like to call it? " or FileName)
 			with open('applications.json') as ApplicationsFile1:
 				data3 = json.load(ApplicationsFile1)
 
@@ -535,7 +535,7 @@ URLToPythonFile)
 				json.dump(data3, json_file,
 						indent=4,
 						separators=(',', ': '))
-			print(f"{bcolors.OKGREEN}Experiment installed!{bcolors.END}")
+			print(f"{bcolors.OKGREEN}File added to PyPlace!{bcolors.END}")
 			NotAnswered4 = False
 			
 
@@ -726,7 +726,7 @@ def PyPlaceRegular():
 	print("What do you want to do?")
 	print(f"""
 [1] Open a PyPlace app
-[2] Download a PyPlace app
+[2] Add a PyPlace app
 [3] Open settings
 [{bcolors.FAIL}e{bcolors.END}] Exit PyPlace
 """)
