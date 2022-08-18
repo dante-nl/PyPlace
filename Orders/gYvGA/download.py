@@ -516,7 +516,7 @@ URLToPythonFile)
 			FileName = input(f"What is the name of the file you would like to add? {bcolors.BOLD}Note:{bcolors.END} this {bcolors.UNDERLINE}MUST{bcolors.END} be in the current folder. ")
 
 			FileExtensionCheck3 = FileName[-3:]
-			if FileExtensionCheck2 != ".py":
+			if FileExtensionCheck3 != ".py":
 				print(f"{bcolors.FAIL}Error:{bcolors.END} This is not a Python file, and thus can not be added to PyPlace.")
 				return
 			Name = input("What would you like to call it?")
