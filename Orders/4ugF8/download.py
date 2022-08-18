@@ -536,8 +536,8 @@ def Settings():
 				print(f"{bcolors.FAIL}Error:{bcolors.END} You do not have any applications installed! You can download them via \"Download a PyPlace app\" on the main menu.")
 				return
 
-			with open('applications.json') as AppsFile:
-				json_data = json.load(AppsFile)
+			with open('applications.json') as AppDict:
+				json_data = json.load(AppDict)
 
 			if "apps" in json_data == False:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} You do not have any applications installed! You can download them via \"Download a PyPlace app\" on the main menu.")
@@ -569,7 +569,7 @@ def Settings():
 			if input.lower() == "c":
 				return
 			input_ = input.split(", ")
-			bulk_delete(input)
+			bulk_delete(input_)
 
 			NotAnswered = False
 
