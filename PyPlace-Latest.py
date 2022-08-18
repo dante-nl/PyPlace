@@ -70,8 +70,29 @@ ReplitMode = False
 # This is the version of PyPlace and is
 # absolutely not recommended to change,
 # except for testing purposes.
-Version = 0.7
+Version = 0.8
 
+# 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿
+# Default: None (changes every Order)
+# Possible options: None, any string
+
+# This is the order that PyPlace uses,
+# if any.
+# PyPlace uses this to get more information
+# about it.
+Order = None
+
+# 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
+# Default: None (changes every Order versions)
+# Possible options: None, any number
+
+# This is the Order that PyPlace is
+# currently using.
+# Orders are used to test out some beta
+# features and are similar to Experiments,
+# however, Orders are directly built in to
+# the PyPlace app.
+OrderVersion = None
 
 # ————————————————————————————
 # Below this line of text, everything
@@ -666,6 +687,65 @@ to open the PyPlace Expirements Store!
 			NotAnswered = False
 			with open('setup.json') as SetupFile:
 				data = json.load(SetupFile)
+			SetupVersion = data["SetupVersion"]
+
+			if Order == None:
+				ExtraLine1 = ""
+				ExtraLine2 = ""
+			else:
+				ExtraLine1 = None
+				ExtraLine2 = None
+				response = requests.get(f"https://pyplace.dantenl.tk/orders/{Order}/manifest.json")
+				if response.status_code == 404:
+					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Could not load Order data."
+					ExtraLine2 = ""
+				if response.status_code != 200:
+					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Could not look that order up! Response code: {response.status_code}"
+					ExtraLine2 = ""
+
+				RequestText = response.text
+				data = json.loads(RequestText)
+
+				try:
+					data["name"]
+				except KeyError:
+					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Invalid order."
+					ExtraLine2 = ""
+
+				try:
+					data["description"]
+				except KeyError:
+					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Invalid order."
+					ExtraLine2 = ""
+
+				try:
+					data["type"]
+				except KeyError:
+					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Invalid order."
+					ExtraLine2 = ""
+
+				try:
+					data["min-version"]
+				except KeyError:
+					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Invalid order."
+					ExtraLine2 = ""
+
+				try:
+					data["downloads"][0]
+				except KeyError:
+					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Invalid order."
+					ExtraLine2 = ""
+
+				try:
+					if data["expired"] == True:
+						ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} This order is no longer valid."
+						ExtraLine2 = ""
+				except KeyError:
+					pass
+
+				if ExtraLine1 == None:
+					ExtraLine1 = f"\n{bcolors.BOLD}Your current Order:{bcolors.END} {data['name']} ({Order})"
+					ExtraLine2 = f"\n{bcolors.BOLD}Your current Order version:{bcolors.END} {OrderVersion}"
 
 			print(f"""
 ██████╗░██╗░░░██╗██████╗░██╗░░░░░░█████╗░░█████╗░███████╗
@@ -681,7 +761,7 @@ various Python applications. PyPlace is designed to
 be as easy to use, so everyone can use it! :D
 
 {bcolors.BOLD}Your version:{bcolors.END} {Version}
-{bcolors.BOLD}Your setup version:{bcolors.END} {data["SetupVersion"]}""")
+{bcolors.BOLD}Your setup version:{bcolors.END} {SetupVersion}{ExtraLine1}{ExtraLine2}""")
 			input("Press [ENTER] to return to the home menu. ")
 		elif Answer == "c":
 			NotAnswered = False
