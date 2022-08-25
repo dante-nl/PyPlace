@@ -1032,7 +1032,7 @@ else:
 		log("File created: setup.json")
 
 	print(language["setup_5"])
-	print(language["setup_6"])
+	input(language["setup_6"])
 	FileName = f"{os.path.splitext(os.path.basename(__file__))[0]}.py"
 	os.system(f"{PythonCommand} {FileName}")
 	sys.exit(1)
