@@ -1034,7 +1034,7 @@ else:
 	print(language["setup_5"])
 	print(language["setup_6"])
 	FileName = f"{os.path.splitext(os.path.basename(__file__))[0]}.py"
-	os.system(f"{PyCommand} {FileName}")
+	os.system(f"{PythonCommand} {FileName}")
 	sys.exit(1)
 	# Read content of setup.json key
 	# with open('setup.json') as SetupFile:
