@@ -1,0 +1,8 @@
+{
+  "name": "PyPlace Language Packs",
+  "description": "Adds support for language packs to add new languages to PyPlace",
+  "type": "overwrite",
+  "min-version": "0.7",
+  "expired": false,
+  "downloads": ["https://pyplace.dantenl.tk/orders/AOPVo/download.py"]
+}
