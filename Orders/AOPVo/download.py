@@ -961,7 +961,7 @@ else:
 		"bulk_delete_message_1": f"{bcolors.INFO}No apps to be deleted.{bcolors.END}",
 		"bulk_delete_message_2": f"{bcolors.OKGREEN}Deleted [amount] app(s)!{bcolors.END}"
 	}
-	with open("applications.json", 'w') as json_file:
+	with open("language.json", 'w') as json_file:
 		json.dump(language, json_file,
 			indent=4,
 			separators=(',', ': '))
