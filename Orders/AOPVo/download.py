@@ -80,7 +80,7 @@ Version = 0.9
 # if any.
 # PyPlace uses this to get more information
 # about it.
-Order = None
+Order = "AOPVo"
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
 # Default: None (changes every Order versions)
@@ -92,7 +92,7 @@ Order = None
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = None
+OrderVersion = 2
 
 # ————————————————————————————
 # Below this line of text, everything
@@ -537,16 +537,16 @@ def Settings():
 """)
 	NotAnswered = True
 	while NotAnswered == True:
-		Answer = input(f"{language['settings_message_1']}: ")
+		Answer = input(f"{language['settings_message_1']}: ").lower()
 		if Answer == "1":
 			if exists("applications.json") == False:
 				print(language['execute_file_error_1'])
 				return
 
-			with open('applications.json') as AppDict:
-				json_data = json.load(AppDict)
+			with open('applications.json') as apps:
+				AppDict = json.load(apps)
 
-			if "apps" in json_data == False:
+			if "apps" in AppDict == False:
 				print(language['execute_file_error_1'])
 				return
 
@@ -573,7 +573,7 @@ def Settings():
 			print(f"[{bcolors.FAIL}c{bcolors.END}] {language['cancel']}")
 
 			input_ = input(f"{language['settings_message_2']} ")
-			if input.lower() == "c":
+			if input_.lower() == "c":
 				return
 			input_ = input.split(" ")
 			bulk_delete(input_)
@@ -833,32 +833,61 @@ def PyPlaceRegular():
 				except KeyError:
 					pass
 
-				print()
-				print(f"{bcolors.BOLD}Incoming Order!{bcolors.END}")
-				print("You have received an Order to test out something new!")
-				print(f"{bcolors.BOLD}Name:{bcolors.END} {data['name']}")
-				print(f"{bcolors.BOLD}Description:{bcolors.END} {data['description']}")
-				print(f"{bcolors.BOLD}Type:{bcolors.END} {data['type']}")
-				waiting = True
-				while waiting == True:
-					answer = input("Would you like to install this Order? (y/n) ").lower()
-					if answer == "y":
-						waiting = False
-						print(f"{bcolors.INFO}Downloading Order...{bcolors.END}")
-						r = requests.get(data["downloads"][0], allow_redirects=True)
-						if not r.ok:
-							print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
+				if data["type"] == "overwrite":
+					print()
+					print(f"{bcolors.BOLD}Incoming Order!{bcolors.END}")
+					print("You have received an Order to test out something new!")
+					print(f"{bcolors.BOLD}Name:{bcolors.END} {data['name']}")
+					print(f"{bcolors.BOLD}Description:{bcolors.END} {data['description']}")
+					print(f"{bcolors.BOLD}Type:{bcolors.END} {data['type']}")
+					waiting = True
+					while waiting == True:
+						answer = input("Would you like to install this Order? (y/n) ").lower()
+						if answer == "y":
+							waiting = False
+							print(f"{bcolors.INFO}Downloading Order...{bcolors.END}")
+							r = requests.get(data["downloads"][0], allow_redirects=True)
+							if not r.ok:
+								print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
+								return
+							print(f"{bcolors.OKGREEN}The Order has been downloaded!")
+							print(f"{bcolors.OKCYAN}Installing the Order{bcolors.END}")
+							open('PyPlace.py', 'wb').write(r.content)
+							print(f"{bcolors.OKGREEN}The Order has been downloaded and installed in {bcolors.BOLD}PyPlace.py!{bcolors.END}")
+							print(f"{bcolors.INFO}Attempting to run PyPlace.py...{bcolors.END}")
+							os.system(f"{PyCommand} PyPlace.py")
+							sys.exit(1)
+						elif answer == "n":
+							waiting = False
 							return
-						print(f"{bcolors.OKGREEN}The Order has been downloaded!")
-						print(f"{bcolors.OKCYAN}Installing the Order{bcolors.END}")
-						open('PyPlace.py', 'wb').write(r.content)
-						print(f"{bcolors.OKGREEN}The Order has been downloaded and installed in {bcolors.BOLD}PyPlace.py!{bcolors.END}")
-						print(f"{bcolors.INFO}Attempting to run PyPlace.py...{bcolors.END}")
-						os.system(f"{PyCommand} PyPlace.py")
-						sys.exit(1)
-					elif answer == "n":
-						waiting = False
-						return
+				elif data["type"] == "language_pack":
+					print()
+					print(f"{bcolors.BOLD}Incoming language pack!{bcolors.END}")
+					print("You have loaded up a new language pack!")
+					print(f"{bcolors.BOLD}Name:{bcolors.END} {data['name']}")
+
+					waiting = True
+					while waiting == True:
+						answer = input("Would you like to install this language pack? (y/n) ").lower()
+						if answer == "y":
+							waiting = False
+							print(f"{bcolors.INFO}Downloading language pack...{bcolors.END}")
+							r = requests.get(data["downloads"][0], allow_redirects=True)
+							if not r.ok:
+								print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
+								return
+							print(f"{bcolors.OKGREEN}The language pack has been downloaded!")
+							print(f"{bcolors.OKCYAN}Installing the language pack...{bcolors.END}")
+							open('language.json', 'wb').write(r.content)
+							print(f"{bcolors.OKGREEN}The language pack has been downloaded and installed in {bcolors.BOLD}language.json!{bcolors.END}")
+							print(f"{bcolors.INFO}Attempting to run PyPlace.py...{bcolors.END}")
+							os.system(f"{PyCommand} PyPlace.py")
+							sys.exit(1)
+						elif answer == "n":
+							waiting = False
+							return
+				else: 
+					error("Could not identify that type of Order! Perhaps it's for a different version?")
 
 			else:
 				print(
@@ -870,10 +899,15 @@ log("Loading language file...")
 if exists("language.json"):
 	with open('language.json') as LanguageFile:
 		language = json.load(LanguageFile)
+	if language["version"] != Version:
+		error("The language pack you are attempting to load is not for the current version. Please update or remove your language.json file to start up PyPlace.")
+		sys.exit(0)
 	log("Language file loaded.")
 else:
 	log("Language file does not exist. Creating language file...")
 	language = {
+		"version": 0.9,
+
 		"input_error": f"{bcolors.FAIL}Error:{bcolors.END} I'm not sure what you mean with that!",
 		"back_to_menu": "Press [ENTER] to return to the main menu.",
 		"cancel": "Cancel",
@@ -947,8 +981,8 @@ else:
 		"settings_option_3": "Restore to latest version",
 		"settings_option_4": "About",
 		"settings_option_5": "Back to main menu",
-		"settings_message_1": "Enter the number or letter for what you want to do:",
-		"settings_message_2": "What apps do you want to delete? (seperated by a space, so for applications 1, 2 and 3, you would enter: 1 2 3",
+		"settings_message_1": "Enter the number or letter for what you want to do",
+		"settings_message_2": "What apps do you want to delete? (seperated by a space, so for applications 1, 2 and 3, you would enter: 1 2 3.",
 		"settings_message_3": "What do you want the new command to be? Leave empty to set to default (python3).",
 		"settings_message_4": "Command updated to [command]!",
 		"settings_message_5": f"Are you sure you want to restore to the latest version published online?",
