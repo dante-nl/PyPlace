@@ -1,6 +1,7 @@
 	
 #// import keyboard
 #// ^ pip install keyboard
+
 import time
 import sys
 import json
@@ -8,16 +9,63 @@ from os.path import exists
 import os
 import random
 
+import requests
+# from PIL import Image, ImageDraw
+
+
+VERSION = 1.0
+
 print()
 print()
 print()
 
 try:
 	from huesdk import Hue
+	from huesdk import Discover
 	#* ^ pip install huesdk
 except:
 	print("Error: Please download huesdk first. You can do this by doing: pip install huesdk --upgrade")
 	sys.exit(0)
+
+optional_requirements_satisfied = 0
+try:
+	import cv2
+	optional_requirements_satisfied += 1
+except:
+	print("Error: Please download opencv-python first. You can do this by doing pip install opencv-python --upgrade")
+	# sys.exit(0)
+
+try:
+	import numpy as np
+	optional_requirements_satisfied += 1
+except:
+	print("Error: Please download numpy first. You can do this by doing pip install numpy --upgrade")
+	# sys.exit(0)
+
+try:
+	import pyautogui
+	optional_requirements_satisfied += 1
+except:
+	print("Error: Please download pyautogui first. You can do this by doing pip install pyautoguis --upgrade")
+	# sys.exit(0)
+
+try:
+	from PIL import Image, ImageDraw
+	optional_requirements_satisfied += 1
+except:
+	print("Error: Please download Pillow first. You can do this by doing pip install Pillow --upgrade")
+	# sys.exit(0)
+
+if optional_requirements_satisfied == 4:
+	SIMULATE_SCREEN = True
+else:
+	SIMULATE_SCREEN = False
+	print("""You are unable to use all features. Please also import with the following commands.
+
+pip install opencv-python --upgrade
+pip install numpy --upgrade
+pip install pyautogui --upgrade
+pip install Pillow --upgrade""")
 
 
 class colors:
@@ -107,8 +155,33 @@ def randomHEX():
 	return '%02X%02X%02X' % (r(), r(), r())
 
 
+def rgb_to_hex(r, g, b):
+	"""Converts r, g, b to a HEX color. Does not include the hashtag"""
+	return ('{:X}{:X}{:X}').format(r, g, b)
 
-HUE_IP = "192.168.1.111"
+
+def get_colors(image_file, numcolors=10, resize=150):
+	"""Get dominant color of an image"""
+	# Resize image to speed up processing
+	# img = Image.open(image_file)
+	# img = img.copy()
+	img = image_file
+	img.thumbnail((resize, resize))
+	# Reduce to palette
+	paletted = img.convert('P', palette=Image.Palette.ADAPTIVE, colors=numcolors)
+	# Find dominant colors
+	palette = paletted.getpalette()
+	color_counts = sorted(paletted.getcolors(), reverse=True)
+	colors = list()
+	for i in range(numcolors):
+		palette_index = color_counts[i][1]
+		dominant_color = palette[palette_index*3:palette_index*3+3]
+		colors.append(tuple(dominant_color))
+	return colors[0]
+
+
+
+
 
 if exists("data.json"):
 	with open('data.json') as dataFile:
@@ -119,6 +192,9 @@ if exists("data.json"):
 			sys.exit(0)
 else:
 	try:
+		discover = Discover()
+		discover = json.loads(discover.find_hue_bridge())
+		HUE_IP = discover[0]["internalipaddress"]
 		USERNAME = Hue.connect(bridge_ip=HUE_IP)
 	except:
 		info("Please press the link button and run LoveHue again.")
@@ -126,11 +202,26 @@ else:
 
 	data_dict = {}
 	data_dict["username"] = USERNAME
+	data_dict["ip"] = HUE_IP
 
 	data_dict_str = json.dumps(data_dict, indent=4, separators=(',', ': '))
 	with open('data.json', 'w') as dataJSON:
 		dataJSON.write(data_dict_str)
 		# log("File created: setup.json")
+try:
+	discover = Discover()
+	# print(discover)
+	discover = json.loads(discover.find_hue_bridge())
+	HUE_IP = discover[0]["internalipaddress"]
+except:
+	info("Trying cached version of IP...")
+	try:
+		with open('data.json') as dataFile:
+			data = json.load(dataFile)
+			HUE_IP = data["ip"]
+	except:
+		error("Could not connect to Hue bridge.")
+		sys.exit(0)
 
 # print(USERNAME)
 
@@ -193,9 +284,10 @@ def animationSelection(lamp):
 	print(f"{colors.OKCYAN}■{colors.END}: .lhad files (LoveHue Animation Dictionary)")
 
 	print(f"""{colors.OKGREEN}[1] Random color{colors.END}
-{colors.OKGREEN}[2] Random brightness{colors.END}""")
+{colors.OKGREEN}[2] Random brightness{colors.END}
+{colors.OKGREEN}[3] Simulate screen{colors.END}""")
 	files = [f for f in os.listdir('.') if os.path.isfile(f)]
-	current_item = 2
+	current_item = 3
 	animation_list = []
 	for f in files:
 		# do something
@@ -287,9 +379,38 @@ def animationSelection(lamp):
 		except:
 			error("Invalid number")
 
+	elif selected_option == 3:
+		input_value = input(f"This will only stop after pressing ctrl+C. Press [ENTER] to confirm or c to cancel. ").lower()
+		if input_value != "c":
+			try:
+				while True:
+					try:
+						img = pyautogui.screenshot()
+						colors_rgb = get_colors(img)
+						hex_color = rgb_to_hex(colors_rgb[0], colors_rgb[1], colors_rgb[2])
+						# print(hex_color)
+						lamp.set_color(hexa=hex_color, transition=0)
+						time.sleep(.1)
+					except:
+						lamp.set_color(hexa="007aff", transition=0)
+						time.sleep(.1)
+					# try:
+					# 	print(rgb_to_hex(get_colors(img)))
+					# except:
+					# 	print(type(get_colors(img)))
+					
+
+			except KeyboardInterrupt:
+				flicker_light(lamp)
+				ok2("Animation completed.")
+				input("Press [ENTER] to go home")
+				pass
+
+		else:
+			invalid_input = False
 	else:
 		# print(animation_list[selected_option - 2])
-		with open(animation_list[selected_option - 3]) as dataFile:
+		with open(animation_list[selected_option - 4]) as dataFile:
 			animation_json = json.load(dataFile)
 		try:
 			animation_name = animation_json["name"]
@@ -321,17 +442,19 @@ def animationSelection(lamp):
 			if input_value != "c":
 				invalid_input = False
 
+				max_lenght = len(animation_json["colors"])
 				current_item = 0
 				current_number = 1
-				max_lenght = len(animation_json["colors"]) - 1
 				if lamp.is_on == False:
 					lamp.on()
 				for _ in range(int(repeat_times)):
 					for __ in range(max_lenght):
 						try:
 							animation_json["colors"][current_item]["color"]
+							from_memory = True
 						except KeyError:
-							animation_json["colors"][current_item]["color"] = lamp.color
+							animation_json["colors"][current_item]["color"] = lamp.hue
+							from_memory = False
 						# print(animation_json["colors"][current_item]["color"])
 
 						try:
@@ -350,16 +473,19 @@ def animationSelection(lamp):
 
 						try:
 							# if animation_json["colors"][current_item]["color"]:
-							lamp.set_color(hexa=animation_json["colors"][current_item]["color"].replace("#", ""))
+							if from_memory == True:
+								lamp.set_color(hexa=animation_json["colors"][current_item]["color"].replace("#", ""))
+							else:
+								lamp.set_color(hue=animation_json["colors"][current_item]["color"])
 							# if animation_json["colors"][current_item]["brightness"]:
 							factor = int(animation_json["colors"][current_item]["brightness"]) / 100
 							selected_light.set_brightness(round(factor * 254))
 							# if animation_json["colors"][current_item]["time_until_next"]:
 							time.sleep(int(animation_json["colors"][current_item]["time_until_next"]))
 							# print(current_item)
-							if current_item == max_lenght:
-								current_item = -1
 							current_item += 1
+							if current_item == max_lenght:
+								current_item = 0
 							# print(current_item)
 						except KeyError:
 							pass
@@ -372,7 +498,71 @@ def animationSelection(lamp):
 			else:
 				invalid_input = False
 
+def UpdateCheck():
+	log("Checking for latest version...")
+	response = requests.get("https://lovehue.dantenl.tk/version.json")
+	if response.status_code != 200:
+		print(f"{colors.FAIL}Error:{colors.END} Could not check for updates! Response code: {response.status_code}")
+		return
 
+	log("Comparing versions...")
+
+	RequestText = response.text
+	data = json.loads(RequestText)
+
+	if data["version"] < VERSION:
+		print(f"{colors.WARNING}WARNING:{colors.END} Your current version seems to be newer than the latest version that is released!")
+	elif data["version"] > VERSION:
+		print("————————")
+		print(f"{colors.BOLD}UPDATE AVAILABLE!{colors.END}")
+		print(
+			f"Your current version ({VERSION}) is no longer the latest version! The latest one is {data['version']}")
+		print(f"""Here are the release notes:
+{data["release_notes"]}
+		""")
+		NotAnswered = True
+		while NotAnswered == True:
+			Answer = input("Would you like to update right now? (y/n) ")
+			Answer = Answer.lower()
+			if Answer == "y":
+				NotAnswered = False
+				print(
+					f"{colors.INFO}Downloading latest version of PyPlace...{colors.END}")
+				log("Retrieving latest version of PyPlace...")
+				r = requests.get(
+					"https://pyplace.dantenl.tk/PyPlace-Latest.py", allow_redirects=True)
+				if not r.ok:
+					print(f"{colors.FAIL}Error:{colors.END} Could not get the PyPlace file! Status code: {r.status_code}")
+					return
+				log("Updating main PyPlace file")
+				open('PyPlace.py', 'wb').write(r.content)
+				print(
+					f"{colors.OKGREEN}The latest version of PyPlace is now ready in {colors.BOLD}PyPlace.py!{colors.END}")
+				NotAnswered2 = True
+				while NotAnswered2 == True:
+					Answer2 = input("Would you like to run it? (y/n) ")
+					Answer2 = Answer2.lower()
+					if Answer2 == "y":
+						print(
+							f"{colors.INFO}Attempting to run PyPlace.py...{colors.END}")
+						os.execv(sys.argv[0], sys.argv)
+						sys.exit(1)
+					elif Answer2 == "n":
+						print(
+							f"Continuing with current version. {colors.BOLD}NOTE:{colors.END} Next time you start PyPlace.py, it will be on the latest version!")
+						NotAnswered2 = False
+						return
+					else:
+						print(
+							f"{colors.FAIL}Error:{colors.END} I'm not sure what you mean with \"{Answer2}\".")
+
+			elif Answer == "n":
+				NotAnswered = False
+				print("Update cancelled!")
+				return
+			else:
+				print(
+					f"{colors.FAIL}Error:{colors.END} I'm not sure what you mean with \"{Answer}\".")
 
 
 selected_light = lightSelection()
@@ -395,6 +585,7 @@ while invalid_option == True:
 [3] Set light(s) to specific HEX color
 [4] Start an animation
 [5] Reset all to before execution of code
+[{colors.INFO}u{colors.END}] Check for LoveHue updates
 [{colors.FAIL}e{colors.END}] Exit""")
 	option = input("Please enter the number or letter. ").lower()
 	if option == "1":
@@ -424,6 +615,12 @@ while invalid_option == True:
 	elif option == "3":
 		try:
 			HEXColor = input("Please enter the HEX color: #")
+			hex_list = []
+			for letter in HEXColor:
+				hex_list.append(letter)
+
+			if len(hex_list) == 3:
+				HEXColor = hex_list[0]+hex_list[0] + hex_list[1]+hex_list[1] + hex_list[2]+hex_list[2]
 			selected_light.on()
 			selected_light.set_color(hexa=HEXColor)
 		except:
@@ -438,5 +635,7 @@ while invalid_option == True:
 			selected_light.off()
 		selected_light.set_brightness(light_data["brightness"])
 		info("Reset all.")
+	elif option == "u":
+		UpdateCheck()
 	elif option == "e":
 		sys.exit(0)
