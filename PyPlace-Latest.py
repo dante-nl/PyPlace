@@ -29,7 +29,7 @@
 # updates via the advanced options.
 # 𝗡𝗢𝗧𝗘: When Replit mode is enabled,
 # this setting is ignored.
-CheckForUpdates = False
+CheckForUpdates = True
 
 # 𝗘𝗻𝗮𝗯𝗹𝗲 𝗼𝗿 𝗱𝗶𝘀𝗮𝗯𝗹𝗲 𝗹𝗼𝗴𝘀
 # Default: True
