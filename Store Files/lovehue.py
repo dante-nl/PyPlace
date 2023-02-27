@@ -714,7 +714,7 @@ def animationSelection(lamp):
 
 def UpdateCheck():
 	log("Checking for latest version...")
-	response = requests.get("https://lovehue.dantenl.tk/version.json")
+	response = requests.get("http://pyplace.dantenl.com/Store%20Files/lovehueversion.json")
 	if response.status_code != 200:
 		print(f"{colors.FAIL}Error:{colors.END} Could not check for updates! Response code: {response.status_code}")
 		return
@@ -741,29 +741,29 @@ def UpdateCheck():
 			if Answer == "y":
 				NotAnswered = False
 				print(
-					f"{colors.INFO}Downloading latest version of PyPlace...{colors.END}")
-				log("Retrieving latest version of PyPlace...")
+					f"{colors.INFO}Downloading latest version of LoveHue...{colors.END}")
+				log("Retrieving latest version of LoveHue...")
 				r = requests.get(
-					"https://pyplace.dantenl.tk/PyPlace-Latest.py", allow_redirects=True)
+					"http://pyplace.dantenl.com/Store%20Files/lovehue.py", allow_redirects=True)
 				if not r.ok:
-					print(f"{colors.FAIL}Error:{colors.END} Could not get the PyPlace file! Status code: {r.status_code}")
+					print(f"{colors.FAIL}Error:{colors.END} Could not get the LoveHue file! Status code: {r.status_code}")
 					return
-				log("Updating main PyPlace file")
-				open('PyPlace.py', 'wb').write(r.content)
+				log("Updating main LoveHue file")
+				open('LoveHue.py', 'wb').write(r.content)
 				print(
-					f"{colors.OKGREEN}The latest version of PyPlace is now ready in {colors.BOLD}PyPlace.py!{colors.END}")
+					f"{colors.OKGREEN}The latest version of LoveHue is now ready in {colors.BOLD}LoveHue.py!{colors.END}")
 				NotAnswered2 = True
 				while NotAnswered2 == True:
 					Answer2 = input("Would you like to run it? (y/n) ")
 					Answer2 = Answer2.lower()
 					if Answer2 == "y":
 						print(
-							f"{colors.INFO}Attempting to run PyPlace.py...{colors.END}")
+							f"{colors.INFO}Attempting to run LoveHue.py...{colors.END}")
 						os.execv(sys.argv[0], sys.argv)
 						sys.exit(1)
 					elif Answer2 == "n":
 						print(
-							f"Continuing with current version. {colors.BOLD}NOTE:{colors.END} Next time you start PyPlace.py, it will be on the latest version!")
+							f"Continuing with current version. {colors.BOLD}NOTE:{colors.END} Next time you start LoveHue.py, it will be on the latest version!")
 						NotAnswered2 = False
 						return
 					else:
