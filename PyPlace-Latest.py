@@ -29,7 +29,7 @@
 # updates via the advanced options.
 # 𝗡𝗢𝗧𝗘: When Replit mode is enabled,
 # this setting is ignored.
-CheckForUpdates = True
+CheckForUpdates = False
 
 # 𝗘𝗻𝗮𝗯𝗹𝗲 𝗼𝗿 𝗱𝗶𝘀𝗮𝗯𝗹𝗲 𝗹𝗼𝗴𝘀
 # Default: True
@@ -64,13 +64,13 @@ DoINeedToRun = True
 ReplitMode = False
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
-# Default: 0.7 (changes every version)
+# Default: 0.9 (changes every version)
 # Possible options: any number
 
 # This is the version of PyPlace and is
 # absolutely not recommended to change,
 # except for testing purposes.
-Version = 0.8
+Version = 0.9
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿
 # Default: None (changes every Order)
@@ -144,7 +144,7 @@ def log(message):
 
 def UpdateCheck():
 	log("Checking for latest version...")
-	response = requests.get("https://pyplace.dantenl.tk/version.json")
+	response = requests.get("http://pyplace.dantenl.com/version.json")
 	if response.status_code != 200:
 		print(f"{bcolors.FAIL}Error:{bcolors.END} Could not check for updates! Response code: {response.status_code}")
 		return
@@ -174,7 +174,7 @@ def UpdateCheck():
 					f"{bcolors.INFO}Downloading latest version of PyPlace...{bcolors.END}")
 				log("Retrieving latest version of PyPlace...")
 				r = requests.get(
-					"https://pyplace.dantenl.tk/PyPlace-Latest.py", allow_redirects=True)
+					"http://pyplace.dantenl.com/PyPlace-Latest.py", allow_redirects=True)
 				if not r.ok:
 					print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
 					return
@@ -356,7 +356,7 @@ URLToPythonFile)
 			else:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} That does not appear to be a valid URL!")
 		elif Answer4 == "2":
-			StoreRequest = requests.get("https://pyplace.dantenl.tk/store.json", allow_redirects=False)
+			StoreRequest = requests.get("http://pyplace.dantenl.com/store.json", allow_redirects=False)
 			if not StoreRequest.ok:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace store! Response code: {StoreRequest.status_code}")
 				return
@@ -451,7 +451,7 @@ URLToPythonFile)
 		elif Answer4 == "3":
 
 			ExperimentRequest = requests.get(
-				"https://pyplace.dantenl.tk/experiments.json", allow_redirects=True)
+				"http://pyplace.dantenl.com/experiments.json", allow_redirects=True)
 			if not ExperimentRequest.ok:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace Experiment Store! Response code: {ExperimentRequest.status_code}")
 				return
@@ -651,7 +651,7 @@ to open the PyPlace Expirements Store!
 						print(f"{bcolors.INFO}Downloading latest version of PyPlace...{bcolors.END}")
 						log("Retrieving latest version of PyPlace...")
 						r = requests.get(
-							"https://pyplace.dantenl.tk/PyPlace-Latest.py", allow_redirects=True)
+							"http://pyplace.dantenl.com/PyPlace-Latest.py", allow_redirects=True)
 						if not r.ok:
 							print(
 								f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
@@ -695,7 +695,7 @@ to open the PyPlace Expirements Store!
 			else:
 				ExtraLine1 = None
 				ExtraLine2 = None
-				response = requests.get(f"https://pyplace.dantenl.tk/orders/{Order}/manifest.json")
+				response = requests.get(f"http://pyplace.dantenl.com/orders/{Order}/manifest.json")
 				if response.status_code == 404:
 					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Could not load Order data."
 					ExtraLine2 = ""
@@ -803,7 +803,7 @@ def PyPlaceRegular():
 			if Answer3.lower().startswith("-install"):
 				order_name = Answer3.lower().replace("-install ", "")
 				log("Looking up order...")
-				response = requests.get(f"https://pyplace.dantenl.tk/orders/{order_name}/manifest.json")
+				response = requests.get(f"http://pyplace.dantenl.com/orders/{order_name}/manifest.json")
 				if response.status_code == 404:
 					print(f"{bcolors.FAIL}Error:{bcolors.END} That order does not exist.")
 					return
