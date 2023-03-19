@@ -75,36 +75,9 @@ pip install Pillow --upgrade""")
 
 
 def lid_closed():
-	"""Returns True if the laptop lid is closed, False otherwise."""
-	if sys.platform == 'darwin':
-		# On macOS, we can use the 'ioreg' command to get the lid state
-		import subprocess
-		result = subprocess.run(
-			['ioreg', '-r', '-k', 'AppleClamshellState', '-d', '4'], capture_output=True, text=True)
-		output = result.stdout.strip()
+	"""Not working. Always returns false"""
+	return False
 
-
-		match = re.search(r'AppleClamshellState.*?(\d+)', output, re.DOTALL)
-		if match:
-			lid_state = int(match.group(1))
-		else:
-			lid_state = 1  # default to open
-		return lid_state == 0
-	elif sys.platform.startswith('win'):
-		# On Windows, we can use the 'powercfg' command to get the lid state
-		import subprocess
-		result = subprocess.run(
-			['powercfg', '-attributes', 'sub_buttonlid', '-q'], capture_output=True, text=True)
-		output = result.stdout.strip()
-		lid_state = output.split()[-1]
-		return lid_state == '0x0'
-	else:
-		# Unsupported platform
-		return False
-
-
-lid_closed_ = lid_closed()
-print(f"Laptop lid is closed: {lid_closed_}")
 
 class colors:
 	LOG = '\033[95m'
@@ -207,10 +180,13 @@ def get_colors(image_file, numcolors=10, resize=150):
 	palette = paletted.getpalette()
 	color_counts = sorted(paletted.getcolors(), reverse=True)
 	colors = list()
-	for i in range(numcolors):
-		palette_index = color_counts[i][1]
-		dominant_color = palette[palette_index*3:palette_index*3+3]
-		colors.append(tuple(dominant_color))
+	try:
+		for i in range(numcolors):
+			palette_index = color_counts[i][1]
+			dominant_color = palette[palette_index*3:palette_index*3+3]
+			colors.append(tuple(dominant_color))
+	except:
+		colors.append((255,0,0))
 	return colors[0]
 
 
@@ -288,7 +264,7 @@ if exists("data.json"):
 else:
 	try:
 		discover = Discover()
-		discover = json.loads(discover.find_hue_bridge())
+		discover = json.loads(discover.find_hue_bridge_mdns(timeout=5))
 		HUE_IP = discover[0]["internalipaddress"]
 		USERNAME = Hue.connect(bridge_ip=HUE_IP)
 	except:
