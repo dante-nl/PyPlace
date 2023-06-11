@@ -1,5 +1,5 @@
 {
-    "version": 0.9,
+    "version": 1.0,
     "input_error": "\u001b[91mFout:\u001b[0m Ik weet niet zeker wat je daar mee bedoelt!",
     "back_to_menu": "Druk op [ENTER] om terug te gaan naar het hoofdmenu",
     "cancel": "Annuleer",
