@@ -30,7 +30,7 @@ class bcolors:
     END = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-BaseURL = "https://cdn.dantenl.tk/"
+BaseURL = "https://pyplace.dantenl.com/"
 
 print()
 print("————————————————————————————")
