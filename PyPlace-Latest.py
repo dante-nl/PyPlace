@@ -70,7 +70,7 @@ ReplitMode = False
 # This is the version of PyPlace and is
 # absolutely not recommended to change,
 # except for testing purposes.
-Version = 0.9
+Version = 0.91
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿
 # Default: None (changes every Order)
@@ -112,6 +112,11 @@ from os.path import exists
 # recommended to edit it, as it might affect
 # how well PyPlace runs.
 
+REQUEST_HEADERS = {
+	"Cache-Control": "no-cache",
+	"Expires": "0"
+}
+
 class bcolors:
 	LOG = '\033[95m'
 	INFO = '\033[94m'
@@ -144,7 +149,7 @@ def log(message):
 
 def UpdateCheck():
 	log("Checking for latest version...")
-	response = requests.get("http://pyplace.dantenl.com/version.json")
+	response = requests.get("http://pyplace.dantenl.com/version.json", headers=REQUEST_HEADERS)
 	if response.status_code != 200:
 		print(f"{bcolors.FAIL}Error:{bcolors.END} Could not check for updates! Response code: {response.status_code}")
 		return
@@ -174,7 +179,7 @@ def UpdateCheck():
 					f"{bcolors.INFO}Downloading latest version of PyPlace...{bcolors.END}")
 				log("Retrieving latest version of PyPlace...")
 				r = requests.get(
-					"http://pyplace.dantenl.com/PyPlace-Latest.py", allow_redirects=True)
+					"http://pyplace.dantenl.com/PyPlace-Latest.py", allow_redirects=True, headers=REQUEST_HEADERS)
 				if not r.ok:
 					print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
 					return
@@ -299,7 +304,8 @@ URLToPythonFile)
 				else:
 					print(f"{bcolors.INFO}Downloading Python app...{bcolors.END}")
 					log(f"Retrieving file from {URLToPythonFile}")
-					r = requests.get(URLToPythonFile, allow_redirects=False)
+					r = requests.get(URLToPythonFile, allow_redirects=False,
+					                 headers=REQUEST_HEADERS)
 					if not r.ok:
 						print(f"{bcolors.FAIL}Error:{bcolors.END} Could not download the Python file! Status code: {r.status_code}")
 						return
@@ -356,7 +362,8 @@ URLToPythonFile)
 			else:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} That does not appear to be a valid URL!")
 		elif Answer4 == "2":
-			StoreRequest = requests.get("http://pyplace.dantenl.com/store.json", allow_redirects=True)
+			StoreRequest = requests.get(
+				"http://pyplace.dantenl.com/store.json", allow_redirects=True, headers=REQUEST_HEADERS)
 			if not StoreRequest.ok:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace store! Response code: {StoreRequest.status_code}")
 				return
@@ -392,7 +399,8 @@ URLToPythonFile)
 					print(f"{bcolors.INFO}Attempting to download {StoreRequestJSON['apps'][item]['name']}...{bcolors.END}")
 					log(f"Retrieving file from {StoreRequestJSON['apps'][item]['url']}...")
 
-					AppRequest = requests.get(StoreRequestJSON['apps'][item]['url'], allow_redirects=True)
+					AppRequest = requests.get(
+						StoreRequestJSON['apps'][item]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
 					if not AppRequest.ok:
 						print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the file! Response code: {AppRequest.status_code}")
 						return
@@ -451,7 +459,7 @@ URLToPythonFile)
 		elif Answer4 == "3":
 
 			ExperimentRequest = requests.get(
-				"http://pyplace.dantenl.com/experiments.json", allow_redirects=True)
+				"http://pyplace.dantenl.com/experiments.json", allow_redirects=True, headers=REQUEST_HEADERS)
 			if not ExperimentRequest.ok:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace Experiment Store! Response code: {ExperimentRequest.status_code}")
 				return
@@ -477,7 +485,8 @@ URLToPythonFile)
 					print(f"{bcolors.INFO}Attempting to download {ExperimentRequestJSON['apps'][item]['name']}...{bcolors.END}")
 					log(f"Retrieving file from {ExperimentRequestJSON['apps'][item]['url']}...")
 
-					AppRequest = requests.get(ExperimentRequestJSON['apps'][item]['url'], allow_redirects=True)
+					AppRequest = requests.get(
+						ExperimentRequestJSON['apps'][item]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
 					if not AppRequest.ok:
 						print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the file! Response code: {AppRequest.status_code}")
 						return
@@ -651,7 +660,7 @@ to open the PyPlace Expirements Store!
 						print(f"{bcolors.INFO}Downloading latest version of PyPlace...{bcolors.END}")
 						log("Retrieving latest version of PyPlace...")
 						r = requests.get(
-							"http://pyplace.dantenl.com/PyPlace-Latest.py", allow_redirects=True)
+							"http://pyplace.dantenl.com/PyPlace-Latest.py", allow_redirects=True, headers=REQUEST_HEADERS)
 						if not r.ok:
 							print(
 								f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
@@ -695,7 +704,8 @@ to open the PyPlace Expirements Store!
 			else:
 				ExtraLine1 = None
 				ExtraLine2 = None
-				response = requests.get(f"http://pyplace.dantenl.com/orders/{Order}/manifest.json")
+				response = requests.get(
+					f"http://pyplace.dantenl.com/orders/{Order}/manifest.json", headers=REQUEST_HEADERS)
 				if response.status_code == 404:
 					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Could not load Order data."
 					ExtraLine2 = ""
@@ -803,7 +813,8 @@ def PyPlaceRegular():
 			if Answer3.lower().startswith("-install"):
 				order_name = Answer3.lower().replace("-install ", "")
 				log("Looking up order...")
-				response = requests.get(f"http://pyplace.dantenl.com/orders/{order_name}/manifest.json")
+				response = requests.get(
+					f"http://pyplace.dantenl.com/orders/{order_name}/manifest.json", headers=REQUEST_HEADERS)
 				if response.status_code == 404:
 					print(f"{bcolors.FAIL}Error:{bcolors.END} That order does not exist.")
 					return
@@ -860,7 +871,8 @@ def PyPlaceRegular():
 					if answer == "y":
 						waiting = False
 						print(f"{bcolors.INFO}Downloading Order...{bcolors.END}")
-						r = requests.get(data["downloads"][0], allow_redirects=True)
+						r = requests.get(data["downloads"][0],
+						                 allow_redirects=True, headers=REQUEST_HEADERS)
 						if not r.ok:
 							print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
 							return
