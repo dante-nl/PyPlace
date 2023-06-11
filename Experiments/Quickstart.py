@@ -85,7 +85,7 @@ def setup():
 	print(f"{bcolors.OKGREEN}PyPlace is set up!{bcolors.END}")
 
 def quickstart():
-	StoreRequest = requests.get("http://cdn.dantenl.com/pyplace/store.json",
+	StoreRequest = requests.get("http://pyplace.dantenl.com/pyplace/store.json",
 	                            allow_redirects=True, headers=REQUEST_HEADERS)
 	if not StoreRequest.ok:
 		print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace Experiment Store! Response code: {StoreRequest.status_code}")
@@ -106,7 +106,7 @@ def quickstart():
 	print(exists("pyplace.py"))
 	if exists("pyplace.py") == False:
 		print(f"{bcolors.INFO}Downloading and installing PyPlace...{bcolors.END}")
-		r = requests.get("http://cdn.dantenl.com/PyPlace/PyPlace-Latest.py",
+		r = requests.get("http://pyplace.dantenl.com/PyPlace/PyPlace-Latest.py",
 		                 allow_redirects=True, headers=REQUEST_HEADERS)
 		if not r.ok:
 			print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
