@@ -356,7 +356,7 @@ URLToPythonFile)
 			else:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} That does not appear to be a valid URL!")
 		elif Answer4 == "2":
-			StoreRequest = requests.get("http://pyplace.dantenl.com/store.json", allow_redirects=False)
+			StoreRequest = requests.get("http://pyplace.dantenl.com/store.json", allow_redirects=True)
 			if not StoreRequest.ok:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace store! Response code: {StoreRequest.status_code}")
 				return
@@ -392,7 +392,7 @@ URLToPythonFile)
 					print(f"{bcolors.INFO}Attempting to download {StoreRequestJSON['apps'][item]['name']}...{bcolors.END}")
 					log(f"Retrieving file from {StoreRequestJSON['apps'][item]['url']}...")
 
-					AppRequest = requests.get(StoreRequestJSON['apps'][item]['url'], allow_redirects=False)
+					AppRequest = requests.get(StoreRequestJSON['apps'][item]['url'], allow_redirects=True)
 					if not AppRequest.ok:
 						print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the file! Response code: {AppRequest.status_code}")
 						return
@@ -477,7 +477,7 @@ URLToPythonFile)
 					print(f"{bcolors.INFO}Attempting to download {ExperimentRequestJSON['apps'][item]['name']}...{bcolors.END}")
 					log(f"Retrieving file from {ExperimentRequestJSON['apps'][item]['url']}...")
 
-					AppRequest = requests.get(ExperimentRequestJSON['apps'][item]['url'], allow_redirects=False)
+					AppRequest = requests.get(ExperimentRequestJSON['apps'][item]['url'], allow_redirects=True)
 					if not AppRequest.ok:
 						print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the file! Response code: {AppRequest.status_code}")
 						return
