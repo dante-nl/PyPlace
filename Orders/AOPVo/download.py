@@ -335,7 +335,7 @@ URLToPythonFile)
 						
 					Name = input(f"{language['download_file_message_6']} ") or "PyPlace Installed App"
 
-					print(language["download_file_7"])
+					print(language["download_file_message_7"])
 
 
 					open(FileName, 'wb').write(r.content)
