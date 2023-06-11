@@ -1,4 +1,4 @@
 {
-	"version": 0.9,
-	"release_notes": "- Bug fixes"
+	"version": 0.91,
+	"release_notes": "- It no longer gets from caches"
 }
