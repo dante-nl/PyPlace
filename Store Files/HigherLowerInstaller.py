@@ -38,7 +38,7 @@ print("Welcome to the Higher Lower Installer for PyPlace!")
 print(f"{bcolors.BOLD}Note:{bcolors.END} This requires an internet connection!")
 
 print(f"{bcolors.INFO}Downloading the main file...")
-HigherLowerMain = requests.get(f"{BaseURL}/PyPlace/Store%20Files/HigherLower.py", allow_redirects=True)
+HigherLowerMain = requests.get(f"{BaseURL}/Store%20Files/HigherLower.py", allow_redirects=True)
 if not HigherLowerMain.ok:
 	print(f"{bcolors.FAIL}Error:{bcolors.END} Could not download the Python file! Status code: {HigherLowerMain.status_code}")
 	sys.exit(0)
@@ -87,7 +87,7 @@ print(f"{bcolors.OKGREEN}Main file installed!{bcolors.END}")
 
 
 print(f"{bcolors.INFO}Downloading and installing the extra files...")
-HigherLowerArt= requests.get(f"{BaseURL}/PyPlace/Store%20Files/HigherLowerArt.py", allow_redirects = True)
+HigherLowerArt= requests.get(f"{BaseURL}/Store%20Files/HigherLowerArt.py", allow_redirects = True)
 
 if not HigherLowerArt.ok:
 	print(f"{bcolors.FAIL}Error:{bcolors.END} Could not download the Python file! Status code: {HigherLowerMain.status_code}")
@@ -95,7 +95,7 @@ if not HigherLowerArt.ok:
 
 open("higher_lower_art.py", 'wb').write(HigherLowerArt.content)
 
-HigherLowerAccounts = requests.get(f"{BaseURL}/PyPlace/Store%20Files/HigherLowerAccounts.py", allow_redirects = True)
+HigherLowerAccounts = requests.get(f"{BaseURL}/Store%20Files/HigherLowerAccounts.py", allow_redirects = True)
 
 if not HigherLowerAccounts.ok:
 	print(f"{bcolors.FAIL}Error:{bcolors.END} Could not download the Python file! Status code: {HigherLowerMain.status_code}")
