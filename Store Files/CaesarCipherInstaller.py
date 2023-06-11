@@ -36,7 +36,7 @@ class bcolors:
     END = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-BaseURL = "https://cdn.dantenl.com/"
+BaseURL = "https://pyplace.dantenl.com"
 
 print()
 print("————————————————————————————")
@@ -44,7 +44,7 @@ print("Welcome to the Caesar Cypher Installer for PyPlace!")
 print(f"{bcolors.BOLD}Note:{bcolors.END} This requires an internet connection!")
 
 print(f"{bcolors.INFO}Downloading the main file...")
-CaesarCipherMain = requests.get(f"{BaseURL}/PyPlace/Store%20Files/CaesarCipher.py", allow_redirects=True)
+CaesarCipherMain = requests.get(f"{BaseURL}/Store%20Files/CaesarCipher.py", allow_redirects=True)
 if not CaesarCipherMain.ok:
 	print(f"{bcolors.FAIL}Error:{bcolors.END} Could not download the Python file! Status code: {CaesarCipherMain.status_code}")
 	sys.exit(0)
@@ -93,7 +93,7 @@ print(f"{bcolors.OKGREEN}Main file installed!{bcolors.END}")
 
 
 print(f"{bcolors.INFO}Downloading and installing the extra file...")
-CaesarCipherExtra = requests.get(f"{BaseURL}/PyPlace/Store%20Files/CaesarCipherArt.py", allow_redirects = True)
+CaesarCipherExtra = requests.get(f"{BaseURL}/Store%20Files/CaesarCipherArt.py", allow_redirects = True)
 
 if not CaesarCipherExtra.ok:
 	print(f"{bcolors.FAIL}Error:{bcolors.END} Could not download the Python file! Status code: {CaesarCipherMain.status_code}")
