@@ -92,7 +92,7 @@ Order = "AOPVo"
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = 3
+OrderVersion = 4
 
 # ————————————————————————————
 # Below this line of text, everything
@@ -585,7 +585,7 @@ def Settings():
 			input_ = input(f"{language['settings_message_2']} ")
 			if input_.lower() == "c":
 				return
-			input_ = input.split(" ")
+			input_ = input_.split(" ")
 			bulk_delete(input_)
 
 			NotAnswered = False
@@ -745,6 +745,10 @@ def bulk_delete(nums):
 		error("You do not have any applications installed.")
 		return "Error"
 	items = len(nums)
+
+	with open('applications.json') as AppFile:
+		AppDict = json.load(AppFile)
+
 	info(f"Deleting {items} apps...")
 	RightApps = []
 	for number in nums:
@@ -765,7 +769,7 @@ def bulk_delete(nums):
 	if items == 0:
 		print(language['bulk_delete_message_1'])
 	else:
-		print(language['bulk_delete_message_2'].replace("[amount]", items))
+		print(language['bulk_delete_message_2'].replace("[amount]", str(items)))
 				
 
 def PyPlaceRegular():
@@ -920,7 +924,7 @@ if exists("language.json"):
 else:
 	log("Language file does not exist. Creating language file...")
 	language = {
-		"version": 0.9,
+		"version": 1.0,
 
 		"input_error": f"{bcolors.FAIL}Error:{bcolors.END} I'm not sure what you mean with that!",
 		"back_to_menu": "Press [ENTER] to return to the main menu.",
