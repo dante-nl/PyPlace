@@ -40,6 +40,12 @@ class bcolors:
 	BOLD = '\033[1m'
 	UNDERLINE = '\033[4m'
 
+
+REQUEST_HEADERS = {
+	"Cache-Control": "no-cache",
+	"Expires": "0"
+}
+
 if exists("setup.json"):
 	with open('setup.json') as SetupFile:
 		_ = json.load(SetupFile)
@@ -79,7 +85,8 @@ def setup():
 	print(f"{bcolors.OKGREEN}PyPlace is set up!{bcolors.END}")
 
 def quickstart():
-	StoreRequest = requests.get("http://cdn.dantenl.com/pyplace/store.json", allow_redirects=True)
+	StoreRequest = requests.get("http://cdn.dantenl.com/pyplace/store.json",
+	                            allow_redirects=True, headers=REQUEST_HEADERS)
 	if not StoreRequest.ok:
 		print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace Experiment Store! Response code: {StoreRequest.status_code}")
 		return
@@ -99,7 +106,8 @@ def quickstart():
 	print(exists("pyplace.py"))
 	if exists("pyplace.py") == False:
 		print(f"{bcolors.INFO}Downloading and installing PyPlace...{bcolors.END}")
-		r = requests.get("http://cdn.dantenl.com/PyPlace/PyPlace-Latest.py", allow_redirects=True)
+		r = requests.get("http://cdn.dantenl.com/PyPlace/PyPlace-Latest.py",
+		                 allow_redirects=True, headers=REQUEST_HEADERS)
 		if not r.ok:
 			print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
 			return
@@ -122,7 +130,8 @@ def download(OfficialName, FileName, StoreRequestJSON):
 	Name = StoreRequestJSON["apps"][OfficialName]["name"]
 	Author = StoreRequestJSON["apps"][OfficialName]["author"]
 	print(f"{bcolors.INFO}Attempting to download and install \"{Name}\"...{bcolors.END}")
-	AppRequest = requests.get(StoreRequestJSON['apps'][OfficialName]['url'], allow_redirects=True)
+	AppRequest = requests.get(
+		StoreRequestJSON['apps'][OfficialName]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
 	if not AppRequest.ok:
 		print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the file! Response code: {AppRequest.status_code}")
 		return
