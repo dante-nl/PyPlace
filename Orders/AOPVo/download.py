@@ -70,7 +70,7 @@ ReplitMode = False
 # This is the version of PyPlace and is
 # absolutely not recommended to change,
 # except for testing purposes.
-Version = 0.9
+Version = 1.0
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿
 # Default: None (changes every Order)
@@ -92,7 +92,7 @@ Order = "AOPVo"
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = 2
+OrderVersion = 3
 
 # ————————————————————————————
 # Below this line of text, everything
@@ -111,6 +111,11 @@ from os.path import exists
 # Below is the main code, it is not
 # recommended to edit it, as it might affect
 # how well PyPlace runs.
+
+REQUEST_HEADERS = {
+	"Cache-Control": "no-cache",
+	"Expires": "0"
+}
 
 class bcolors:
 	LOG = '\033[95m'
@@ -152,7 +157,8 @@ def info(info_msg):
 
 def UpdateCheck():
 	log("Checking for latest version...")
-	response = requests.get("https://pyplace.dantenl.tk/version.json")
+	response = requests.get(
+		"https://pyplace.dantenl.com/version.json", headers=REQUEST_HEADERS)
 	if response.status_code != 200:
 		print(language["update_error_1"].replace("[code]", response.status_code))
 		return
@@ -181,7 +187,7 @@ def UpdateCheck():
 				print(language["update_message_5"])
 				log("Retrieving latest version of PyPlace...")
 				r = requests.get(
-					"https://pyplace.dantenl.tk/PyPlace-Latest.py", allow_redirects=True)
+					"https://pyplace.dantenl.com/PyPlace-Latest.py", allow_redirects=True, headers=REQUEST_HEADERS)
 				if not r.ok:
 					print(language["update_error_2"].replace("[code]", r.status_code))
 					return
@@ -300,7 +306,8 @@ URLToPythonFile)
 				else:
 					print(language["download_file_message_3"])
 					log(f"Retrieving file from {URLToPythonFile}")
-					r = requests.get(URLToPythonFile, allow_redirects=False)
+					r = requests.get(URLToPythonFile, allow_redirects=True,
+					                 headers=REQUEST_HEADERS)
 					if not r.ok:
 						print(language["download_file_error_2"].replace("[code]", r.status_code))
 						return
@@ -356,7 +363,8 @@ URLToPythonFile)
 			else:
 				print(language["download_file_error_4"])
 		elif Answer4 == "2":
-			StoreRequest = requests.get("https://pyplace.dantenl.tk/store.json", allow_redirects=False)
+			StoreRequest = requests.get(
+				"https://pyplace.dantenl.com/store.json", allow_redirects=True, headers=REQUEST_HEADERS)
 			if not StoreRequest.ok:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace store! Response code: {StoreRequest.status_code}")
 				return
@@ -392,7 +400,8 @@ URLToPythonFile)
 					print(f"{bcolors.INFO}Attempting to download {StoreRequestJSON['apps'][item]['name']}...{bcolors.END}")
 					log(f"Retrieving file from {StoreRequestJSON['apps'][item]['url']}...")
 
-					AppRequest = requests.get(StoreRequestJSON['apps'][item]['url'], allow_redirects=False)
+					AppRequest = requests.get(
+						StoreRequestJSON['apps'][item]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
 					if not AppRequest.ok:
 						print(language["download_file_error_2"].replace("[code]", AppRequest.status_code))
 						return
@@ -448,9 +457,9 @@ URLToPythonFile)
 		elif Answer4 == "3":
 
 			ExperimentRequest = requests.get(
-				"https://pyplace.dantenl.tk/experiments.json", allow_redirects=True)
+				"https://pyplace.dantenl.com/experiments.json", allow_redirects=True, headers=REQUEST_HEADERS)
 			if not ExperimentRequest.ok:
-				print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace Experiment Store! Response code: {ExperimentRequest.status_code}")
+				print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace Experiment Store! Response code: {ExperimentRequest.status_code}",)
 				return
 			ExperimentRequestText = ExperimentRequest.text
 			ExperimentRequestJSON = json.loads(ExperimentRequestText)
@@ -473,7 +482,8 @@ URLToPythonFile)
 				if str(ItemCount) == str(NumberExperimentNeeded):
 					log(f"Retrieving file from {ExperimentRequestJSON['apps'][item]['url']}...")
 
-					AppRequest = requests.get(ExperimentRequestJSON['apps'][item]['url'], allow_redirects=False)
+					AppRequest = requests.get(
+						ExperimentRequestJSON['apps'][item]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
 					if not AppRequest.ok:
 						print(language["download_file_error_2"].replace("[code]", AppRequest.status_code))
 						return
@@ -613,7 +623,7 @@ def Settings():
 						print(language['settings_message_6'])
 						log("Retrieving latest version of PyPlace...")
 						r = requests.get(
-							"https://pyplace.dantenl.tk/PyPlace-Latest.py", allow_redirects=True)
+							"https://pyplace.dantenl.com/PyPlace-Latest.py", allow_redirects=True, headers=REQUEST_HEADERS)
 						if not r.ok:
 							print(
 								f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
@@ -655,7 +665,8 @@ def Settings():
 			else:
 				ExtraLine1 = None
 				ExtraLine2 = None
-				response = requests.get(f"https://pyplace.dantenl.tk/orders/{Order}/manifest.json")
+				response = requests.get(
+					f"https://pyplace.dantenl.com/orders/{Order}/manifest.json", headers=REQUEST_HEADERS)
 				if response.status_code == 404:
 					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Could not load Order data."
 					ExtraLine2 = ""
@@ -788,7 +799,8 @@ def PyPlaceRegular():
 			if Answer3.lower().startswith("-install"):
 				order_name = Answer3.lower().replace("-install ", "")
 				log("Looking up order...")
-				response = requests.get(f"https://pyplace.dantenl.tk/orders/{order_name}/manifest.json")
+				response = requests.get(
+					f"https://pyplace.dantenl.com/orders/{order_name}/manifest.json", headers=REQUEST_HEADERS)
 				if response.status_code == 404:
 					print(f"{bcolors.FAIL}Error:{bcolors.END} That order does not exist.")
 					return
@@ -846,7 +858,8 @@ def PyPlaceRegular():
 						if answer == "y":
 							waiting = False
 							print(f"{bcolors.INFO}Downloading Order...{bcolors.END}")
-							r = requests.get(data["downloads"][0], allow_redirects=True)
+							r = requests.get(data["downloads"][0],
+							                 allow_redirects=True, headers=REQUEST_HEADERS)
 							if not r.ok:
 								print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
 								return
@@ -872,7 +885,8 @@ def PyPlaceRegular():
 						if answer == "y":
 							waiting = False
 							print(f"{bcolors.INFO}Downloading language pack...{bcolors.END}")
-							r = requests.get(data["downloads"][0], allow_redirects=True)
+							r = requests.get(data["downloads"][0],
+							                 allow_redirects=True, headers=REQUEST_HEADERS)
 							if not r.ok:
 								print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
 								return
