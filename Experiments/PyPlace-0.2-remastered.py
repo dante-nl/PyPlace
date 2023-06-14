@@ -78,6 +78,12 @@ import os
 # recommended to edit it, as it might affect
 # how well PyPlace runs.
 
+# ! This was added during revamp
+REQUEST_HEADERS = {
+	"Cache-Control": "no-cache",
+	"Expires": "0"
+}
+
 class bcolors:
 	LOG = '\033[95m'
 	INFO = '\033[94m'
@@ -106,7 +112,7 @@ def log(message):
 
 def UpdateCheck():
 	log("Checking for latest version...")
-	response = requests.get("https://cdn.dantenl.tk/PyPlace/version.json")
+	response = requests.get("https://cdn.dantenl.com/PyPlace/version.json", allow_redirects=True, headers=REQUEST_HEADERS)
 	if response.status_code != 200:
 		print(f"{bcolors.FAIL}Error:{bcolors.END} Could not check for updates! Response code: {response.status_code}")
 		return
@@ -136,7 +142,7 @@ def UpdateCheck():
 					f"{bcolors.INFO}Downloading latest version of PyPlace...{bcolors.END}")
 				log("Retrieving latest version of PyPlace...")
 				r = requests.get(
-					"https://cdn.dantenl.tk/PyPlace/PyPlace-Latest.py", allow_redirects=True)
+					"https://cdn.dantenl.com/PyPlace/PyPlace-Latest.py", allow_redirects=True, headers=REQUEST_HEADERS)
 				if not r.ok:
 					print(
 						f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
@@ -253,7 +259,8 @@ def DownloadFile():
 				else:
 					print(f"{bcolors.INFO}Downloading Python app...{bcolors.END}")
 					log(f"Retrieving file from {URLToPythonFile}")
-					r = requests.get(URLToPythonFile, allow_redirects=False)
+					r = requests.get(URLToPythonFile, allow_redirects=True,
+					                 headers=REQUEST_HEADERS)
 					if not r.ok:
 						print(
 							f"{bcolors.FAIL}Error:{bcolors.END} Could not download the Python file! Status code: {r.status_code}")
@@ -318,7 +325,7 @@ def DownloadFile():
 					f"{bcolors.FAIL}Error:{bcolors.END} That does not appear to be a valid URL!")
 		elif Answer4 == "2":
 			StoreRequest = requests.get(
-				"https://cdn.dantenl.tk/pyplace/store.json", allow_redirects=False)
+				"https://cdn.dantenl.com/pyplace/store.json", allow_redirects=True, headers=REQUEST_HEADERS)
 			if not StoreRequest.ok:
 				print(
 					f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace store! Response code: {StoreRequest.status_code}")
@@ -362,7 +369,7 @@ def DownloadFile():
 						f"Retrieving file from {StoreRequestJSON['apps'][item]['url']}...")
 
 					AppRequest = requests.get(
-						StoreRequestJSON['apps'][item]['url'], allow_redirects=False)
+						StoreRequestJSON['apps'][item]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
 					if not AppRequest.ok:
 						print(
 							f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace store! Response code: {AppRequest.status_code}")
@@ -519,7 +526,7 @@ def Settings():
 						f"{bcolors.INFO}Downloading latest version of PyPlace...{bcolors.END}")
 					log("Retrieving latest version of PyPlace...")
 					r = requests.get(
-						"https://cdn.dantenl.tk/PyPlace/PyPlace-Latest.py", allow_redirects=True)
+						"https://cdn.dantenl.com/PyPlace/PyPlace-Latest.py", allow_redirects=True, headers=REQUEST_HEADERS)
 					if not r.ok:
 						print(
 							f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
