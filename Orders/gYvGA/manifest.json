@@ -3,7 +3,7 @@
 	"description": "This allows you to add local Python files.",
 	"type": "overwrite",
 	"min-version": "0.7",
-	"expired": false,
+	"expired": true,
 	"downloads": [
 		"https://pyplace.dantenl.com/orders/gYvGA/download.py"
 	]
