@@ -3,6 +3,6 @@
   "description": "Adds support for language packs to add new languages to PyPlace and also adds PyPlace Bulk Delete",
   "type": "overwrite",
   "min-version": "0.7",
-  "expired": false,
+  "expired": true,
   "downloads": ["https://pyplace.dantenl.com/orders/AOPVo/download.py"]
 }
