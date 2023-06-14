@@ -3,6 +3,6 @@
   "description": "Order description",
   "type": "overwrite",
   "min-version": "0.7",
-  "expired": false,
+  "expired": true,
   "downloads": ["https://pyplace.dantenl.com/PyPlace-Latest.py"]
 }
