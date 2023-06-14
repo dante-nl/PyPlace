@@ -603,7 +603,8 @@ def Settings():
 				elif "experiment" in AppDict["apps"][item]:
 					if AppDict["apps"][item]["experiment"] == "true":
 						print(f"{bcolors.WARNING}[{num_app}] {AppDict['apps'][item]['name']}{bcolors.END}")
-
+				else:
+					print(f"[{num_app}] {AppDict['apps'][item]['name']}")
 
 			if num_app == 0:
 				error(language['execute_file_error_1'])
