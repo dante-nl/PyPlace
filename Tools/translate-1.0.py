@@ -13,7 +13,7 @@
 # ░░░██║░░░██║░░██║██║░░██║██║░╚███║██████╔╝███████╗██║░░██║░░░██║░░░██║╚█████╔╝██║░╚███║██████╔╝
 # ░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═════╝░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░╚════╝░╚═╝░░╚══╝╚═════╝░
 
-# F̲o̲r̲ v̲e̲r̲s̲i̲o̲n̲ 1̲.̲0̲
+# F̲o̲r̲ v̲e̲r̲s̲i̲o̲n̲ 1̲.̲0̲ (version 3)
 # 🄱🅈 🄳🄰🄽🅃🄴_🄽🄻
 
 # This PyPlace app allows you to help translate PyPlace in to your language!
@@ -112,14 +112,12 @@ while invalid_input == True:
 		ask_translation("Press [ENTER] to return to the main menu", "back_to_menu")
 		ask_translation("Cancel", "cancel")
 
-		info("Intro messages")
+		info("Intro message.")
 		ask_translation("Welcome to [b]PyPlace[\]!", "intro_1")
-		info("Next few prompts are follow-ups.")
-		ask_translation("PyPlace is a Python application that allows you", "intro_2")
-		ask_translation("to get a simple overview of your other Python", "intro_3")
-		ask_translation("applications, and it also allows you to easily", "intro_4")
-		ask_translation("install new ones!", "intro_5")
-		info("End of follow-ups.")
+
+
+		info("There are multiple new lines so the text won't look so long.")
+		ask_translation("PyPlace is a Python application that allows you [nl]to get a simple overview of your other Python [nl]applications, and it also allows you to easily [nl]install new ones!", "intro_2")
 
 		info("Start-up warnings")
 		ask_translation("[o]WARNING:[\] It appears that you're running this on the Replit page! Not everything might work properly because of different file names. We recommend downloading PyPlace and running it for yourself.", "replit_warning")
@@ -184,6 +182,7 @@ while invalid_input == True:
 		ask_translation("It can now be opened via the \"Open a PyPlace app\" feature on the main menu!", "download_file_message_9")
 		ask_translation("What number app do you want to download?", "download_file_message_10")
 		ask_translation("What is the name of the file you would like to add? [b]Note:[\] This [u]MUST[\] be in the current folder.", "download_file_message_11")
+		ask_translation("Are you sure that you want to download an external file?", "download_file_message_12")
 
 		info("The settings")
 		ask_translation("[r]Error:[\] This is not available when PyPlace is executed on Replit. [b]You can download PyPlace instead.[\]", "settings_error_1")
@@ -192,6 +191,7 @@ while invalid_input == True:
 		ask_translation("Restore to latest version", "settings_option_3")
 		ask_translation("About", "settings_option_4")
 		ask_translation("Back to main menu", "settings_option_5")
+		ask_translation("Manage updater settings", "settings_option_6")
 		ask_translation("Enter the number or letter for what you want to do.", "settings_message_1")
 		ask_translation("What apps do you want to delete? (seperated by a space, so for applications 1, 2 and 3, you would enter 1 2 3.)", "settings_message_2")
 		ask_translation("What do you want the new command to be? Leave empty to set to default (python3).", "settings_message_3")
@@ -203,6 +203,14 @@ while invalid_input == True:
 		ask_translation("[i]Attempting to run PyPlace.py...[\]", "settings_message_9")
 		ask_translation("Continuing with current version. [b]NOTE:[\] Next time you start PyPlace.py, it will be on the latest version!", "settings_message_10")
 
+		ask_translation("Enable checking for updates", "settings_updater_option_1_a")
+		ask_translation("Disable checking for updates", "settings_updater_option_1_b")
+		ask_translation("Check for updates now", "settings_updater_option_2")
+		ask_translation("[g]Updater enabled![\]", "settings_updater_message_1_a")
+		ask_translation("[g]Updater disabld![\]", "settings_updater_message_1_b")
+		ask_translation("[i]Checking for updates...[\]", "settings_updater_message_2")
+		ask_translation("[g]Checked for updates![\]", "settings_updater_message_2")
+
 		info("PyPlace Bulk Delete prompts")
 		ask_translation("[i]No apps to be deleted.[\]", "bulk_delete_message_1")
 		ask_translation("[g]Deleted [amount] app(s)![\]", "bulk_delete_message_2")
@@ -210,8 +218,22 @@ while invalid_input == True:
 		can_try_out = True
 	elif input_to_handle == "2":
 		invalid_input = False
+
+		ask_translation("PyPlace is a Python application that allows you [nl]to get a simple overview of your other Python [nl]applications, and it also allows you to easily [nl]install new ones!", "intro_2")
+
 		ask_translation("Add local file", "download_file_option_4")
 		ask_translation("What is the name of the file you would like to add? [b]Note:[\] This [u]MUST[\] be in the current folder.", "download_file_message_11")
+		ask_translation("Are you sure that you want to download an external file?", "download_file_message_12")
+		
+		ask_translation("Manage updater settings", "settings_option_6")
+
+		ask_translation("Enable checking for updates", "settings_updater_option_1_a")
+		ask_translation("Disable checking for updates", "settings_updater_option_1_b")
+		ask_translation("Check for updates now", "settings_updater_option_2")
+		ask_translation("[g]Updater enabled![\]", "settings_updater_message_1_a")
+		ask_translation("[g]Updater disabld![\]", "settings_updater_message_1_b")
+		ask_translation("[i]Checking for updates...[\]", "settings_updater_message_2")
+		ask_translation("[g]Checked for updates![\]", "settings_updater_message_2")
 		can_try_out = False
 
 print(f"{bcolors.OKGREEN}Done!{bcolors.END} You have completed all the translations for this version!")
