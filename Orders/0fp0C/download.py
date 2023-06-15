@@ -28,7 +28,7 @@
 # is doing? This might clutter the output
 # with various small things, such as when
 # a file is created.
-DoNotLogOutput = True
+DoNotLogOutput = False
 
 # 𝗘𝗻𝗮𝗯𝗹𝗲 𝗼𝗿 𝗱𝗶𝘀𝗮𝗯𝗹𝗲 𝘁𝗵𝗲 𝗺𝗮𝗶𝗻 𝘀𝗰𝗿𝗶𝗽𝘁
 # Default: True
@@ -92,7 +92,7 @@ Order = "0fp0C"
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = 3
+OrderVersion = 4
 
 # ————————————————————————————
 # Below this line of text, everything
@@ -159,6 +159,37 @@ def warn(warning_msg):
 def info(info_msg):
 	print(f"{bcolors.INFO}{info_msg}{bcolors.END}")
 
+def downloadFromStore(OfficialName, FileName, StoreRequestJSON, Version):
+	"""Download an application from the PyPlace store."""
+	Name = StoreRequestJSON["apps"][OfficialName]["name"]
+	Author = StoreRequestJSON["apps"][OfficialName]["author"]
+	log(f"Attempting to download and install \"{Name}\"...")
+	AppRequest = requests.get(
+		StoreRequestJSON['apps'][OfficialName]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
+	if not AppRequest.ok:
+		print(language["download_file_error_2"].replace("[code]", AppRequest.status_code))
+		return
+	else:
+		open(FileName, 'wb').write(AppRequest.content)
+		with open('applications.json') as ApplicationsFile1:
+				data3 = json.load(ApplicationsFile1)
+
+				data3["apps"].update(
+					{
+						f"{Name}": {
+							"name": f"{Name}",
+							"file_name": f"{FileName}",
+							"author": f"{Author}",
+							"StoreApp": "true",
+							"version": Version
+						}
+					})
+				with open("applications.json", 'w') as json_file:
+					json.dump(data3, json_file,
+							indent=4,
+							separators=(',', ': '))
+		log("Updated file")
+
 def UpdateCheck():
 	log("Checking for latest version...")
 	response = requests.get(
@@ -222,7 +253,6 @@ def UpdateCheck():
 			else:
 				print(
 					f"{bcolors.FAIL}Error:{bcolors.END} I'm not sure what you mean with \"{Answer}\".")
-
 
 def ExecuteFile():
 	if exists("applications.json") == False:
@@ -543,7 +573,7 @@ URLToPythonFile)
 
 		elif str(Answer4) == "4":
 			NotAnswered4 = False
-			FileName = input(language["download_file_message_7"]+" ")
+			FileName = input(language["download_file_message_11"]+" ")
 
 			FileExtensionCheck3 = FileName[-3:]
 			if FileExtensionCheck3 != ".py":
@@ -568,9 +598,11 @@ URLToPythonFile)
 			print(language["download_file_message_8"])
 			print(language["download_file_message_9"])
 			NotAnswered4 = False
+		elif str(Answer4) == "c":
+			NotAnswered4 = False
+			return
 
 def Settings():
-# ! warp
 	print()
 	print(language["main_menu_message_1"])
 	print(f"""
@@ -747,6 +779,7 @@ def Settings():
 					print(language["settings_updater_message_3"])
 				elif updater_options_answer == "c":
 					invalid_answer_options_submenu = False
+					return
 				else:
 					print(language["input_error"])
 
@@ -864,14 +897,143 @@ def bulk_delete(nums):
 			os.remove(AppDict["apps"][RightApp]["file_name"])
 		del AppDict["apps"][RightApp]
 		with open('applications.json', 'w') as data_file:
-				data = json.dump(AppDict, data_file,
+				json.dump(AppDict, data_file,
 									indent=4,
 									separators=(',', ': '))
 	if items == 0:
 		print(language['bulk_delete_message_1'])
 	else:
 		print(language['bulk_delete_message_2'].replace("[amount]", str(items)))
+
+def ExternalAppUpdater():
+	# Get setup file
+	log("Checking if applications support system")
+
+	with open('applications.json') as AppFile:
+		AppFile = json.load(AppFile)
+		AppFile = AppFile["apps"]
+	
+	fails = 0
+	total_apps = 0
+	for key in AppFile:
+		if "StoreApp" in AppFile[key] and AppFile[key]["StoreApp"] == "true":
+			total_apps += 1
+			try:
+				AppFile[key]["version"]
+			except:
+				fails += 1
+
+	StoreRequest = requests.get("https://pyplace.dantenl.com/store.json", allow_redirects=True, headers=REQUEST_HEADERS)
+	if not StoreRequest.ok:
+		print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace store! Response code: {StoreRequest.status_code}")
+		return
+	StoreRequestText = StoreRequest.text
+	StoreRequestJSON = json.loads(StoreRequestText)["apps"]
+	StoreRequestOriginal = json.loads(StoreRequestText)
+
+
+	if fails != total_apps:
+		log("Checking for updates...")
+
+		apps_with_updates = []
+		for app in AppFile:
+			for store_app in StoreRequestJSON:
+				if "StoreApp" in AppFile[key] and AppFile[key]["StoreApp"] == "true":
+					if "version" in AppFile[key] and "version" in StoreRequestJSON[store_app]:
+						if AppFile[key]["name"] == StoreRequestJSON[store_app]["name"]:
+							if str(AppFile[key]["version"]) != str(StoreRequestJSON[store_app]["version"]):
+								apps_with_updates.append(StoreRequestJSON[app]["name"])
+
+		if len(apps_with_updates) == 0:
+			print(language["app_updater_message_4"])
+		else:
+			index = 1
+			for app in apps_with_updates:
+				print(f"{bcolors.OKCYAN}[{index}] {apps_with_updates[index-1]} {bcolors.END}")
+				index += 1
+
+			invalid_input2 = True 
+			while invalid_input2 == True:
+				update_choice = input(language["app_updater_message_3"]+" (y/n) ").lower()
 				
+				if update_choice == "y":
+					invalid_input2 = False
+					for app in apps_with_updates:
+						for store_app in StoreRequestJSON:
+							if StoreRequestJSON[store_app]["name"] == app:
+								app_version = StoreRequestJSON[store_app]["version"]
+								official_name = store_app
+								break
+						for local_app in AppFile:
+							if AppFile[local_app]["name"] == app:
+								filename = AppFile[local_app]["file_name"]
+						downloadFromStore(official_name, filename, StoreRequestOriginal, app_version)
+				elif update_choice == "n":
+					invalid_input2 = False
+					return
+				else:
+					print(language["input_error"])
+
+	if fails >= 1:
+		print(language["app_updater_error_1"])
+		invalid_input = True
+		while invalid_input == True:
+			check_for_support = input(language["app_updater_message_1"]+" (y/n) ").lower()
+			if check_for_support == "y":
+				invalid_input = False
+
+				log("Looking for updates")
+
+
+				found_apps = []
+
+				for app in StoreRequestJSON:
+					for local_app in AppFile:
+						if "StoreApp" in AppFile[local_app] and AppFile[local_app]["StoreApp"] == "true":
+						# log(app)
+						# log(len(AppFile[local_app]))
+						# log(AppFile[local_app]["name"])
+						# log(StoreRequestJSON[app]["name"])
+							if AppFile[local_app]["name"] == StoreRequestJSON[app]["name"]:
+								try:
+									StoreRequestJSON[app]["version"]
+									found_apps.append(StoreRequestJSON[app]["name"])
+								except:
+									pass
+				if len(found_apps) == 0:
+					print(language["app_updater_message_2"])
+					return
+				
+				index = 1
+				for app in found_apps:
+					print(f"{bcolors.OKCYAN}[{index}] {found_apps[index-1]} {bcolors.END}")
+					index += 1
+
+				invalid_input2 = True 
+				while invalid_input2 == True:
+					update_choice = input(language["app_updater_message_3"]+" (y/n) ").lower()
+					
+					if update_choice == "y":
+						invalid_input2 = False
+						for app in found_apps:
+							for store_app in StoreRequestJSON:
+								if StoreRequestJSON[store_app]["name"] == app:
+									app_version = StoreRequestJSON[store_app]["version"]
+									official_name = store_app
+									break
+							for local_app in AppFile:
+								if AppFile[local_app]["name"] == app:
+									filename = AppFile[local_app]["file_name"]
+							downloadFromStore(official_name, filename, StoreRequestOriginal, app_version)
+					elif update_choice == "n":
+						invalid_input2 = False
+						return
+					else:
+						print(language["input_error"])
+
+
+
+
 
 def PyPlaceRegular():
 	log("Reading application file...")
@@ -879,7 +1041,8 @@ def PyPlaceRegular():
 	print(f"""
 [1] {language["main_menu_option_1"]}
 [2] {language["main_menu_option_2"]}
-[3] {language["main_menu_option_3"]}
+[3] {language["main_menu_option_5"]}
+[4] {language["main_menu_option_3"]}
 [{bcolors.FAIL}e{bcolors.END}] {language["main_menu_option_4"]}
 """)
 	NotAnswered3 = True
@@ -894,6 +1057,10 @@ def PyPlaceRegular():
 			DownloadFile()
 			return
 		elif str(Answer3) == "3":
+			NotAnswered3 = False
+			ExternalAppUpdater()
+			return
+		elif str(Answer3) == "4":
 			NotAnswered3 = False
 			Settings()
 			return
@@ -1040,9 +1207,10 @@ language = {
 		"setup_6": "Press [ENTER] to start PyPlace",
 
 		"main_menu_option_1": "Open a PyPlace app",
-		"main_menu_option_2": "Download a PyPlace app",
+		"main_menu_option_2": "Add a PyPlace app",
 		"main_menu_option_3": "Open settings",
 		"main_menu_option_4": "Exit PyPlace",
+		"main_menu_option_5": "Check for app updates",
 		"main_menu_message_1": "What do you want to do?",
 		"main_menu_message_2": "Enter the number or letter for what you want to do:",
 
@@ -1116,7 +1284,13 @@ language = {
 
 
 		"bulk_delete_message_1": f"{bcolors.INFO}No apps to be deleted.{bcolors.END}",
-		"bulk_delete_message_2": f"{bcolors.OKGREEN}Deleted [amount] app(s)!{bcolors.END}"
+		"bulk_delete_message_2": f"{bcolors.OKGREEN}Deleted [amount] app(s)!{bcolors.END}",
+
+		"app_updater_error_1": f"{bcolors.FAIL}Error:{bcolors.END} No apps that you have installed via the PyPlace Store support this system (yet)",
+		"app_updater_message_1": f"Some of your apps do not support the updater. Would you like to check if a newer version might support it? ",
+		"app_updater_message_2": f"No apps found. Please check back later",
+		"app_updater_message_3": f"Would you like to update the following app(s) to the latest version?",
+		"app_updater_message_4": f"All apps are on the latest version!"
 	}
 
 if exists("language.json"):
