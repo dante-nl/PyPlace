@@ -1146,7 +1146,7 @@ def downloadFromArguments(url):
 			else:
 				invalidInput = True
 				while invalidInput == True:
-					confirmation = input(language["download_file_message_12"])
+					confirmation = input(language["download_file_message_12"]+" (y/n) ")
 					if confirmation.lower() == "y":
 						invalidInput = False
 						print(language["download_file_message_3"])
@@ -1205,6 +1205,10 @@ def downloadFromArguments(url):
 							json.dump(data2, json_file, indent=4, separators=(',', ': '))
 						print(language["download_file_message_8"])
 						print(language["download_file_message_9"])
+					elif confirmation.lower() == "n":
+						invalidInput = False
+					else:
+						print(language["input_error"])
 		else:
 			print(language["download_file_error_4"])
 
