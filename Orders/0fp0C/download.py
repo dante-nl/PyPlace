@@ -92,7 +92,7 @@ Order = "0fp0C"
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = 4
+OrderVersion = 4.1
 
 # ————————————————————————————
 # Below this line of text, everything
@@ -305,8 +305,8 @@ def ExecuteFile():
 
 			elif exists(f"{json_data['apps'][item]['file_name']}") == True:
 				os.system(f"{PyCommand} {json_data['apps'][item]['file_name']}")
-				print(f"{bcolors.OKGREEN}File executed{bcolors.END}")
-				input("Press [ENTER] to return to the home menu. ")
+				print(language["execute_file_message_6"])
+				input(language["back_to_menu"]+" ")
 
 			else:
 				print(
@@ -464,7 +464,7 @@ URLToPythonFile)
 							print(language["download_file_error_3"].replace("[name]", FileName1))
 							InvalidAnswer1 = True
 
-					Name = StoreRequestJSON["apps"][item]["name"]
+					Name = StoreRequestJSON["apps"][item]["name"]						
 
 					print(language["download_file_message_7"])
 
@@ -482,6 +482,10 @@ URLToPythonFile)
 								"StoreApp": "true"
 							}
 						})
+					
+					if "version" in StoreRequestJSON["apps"][item]:
+						data3["apps"][Name]["version"] = StoreRequestJSON["apps"][item]["version"]
+
 					log("Appending to applications.json")
 					with open("applications.json", 'w') as json_file:
 						json.dump(data3, json_file,
