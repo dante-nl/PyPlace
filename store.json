@@ -48,7 +48,8 @@
 		"LoveHue": {
 			"name": "LoveHue — Control Hue lights in Python",
 			"url": "https://pyplace.dantenl.com/store%20files/lovehue.py",
-			"author": "dante_nl"
+			"author": "dante_nl",
+			"version": 1.0
 		}
 	}
 }
