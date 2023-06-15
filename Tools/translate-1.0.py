@@ -13,7 +13,7 @@
 # ░░░██║░░░██║░░██║██║░░██║██║░╚███║██████╔╝███████╗██║░░██║░░░██║░░░██║╚█████╔╝██║░╚███║██████╔╝
 # ░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═════╝░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░╚════╝░╚═╝░░╚══╝╚═════╝░
 
-# F̲o̲r̲ v̲e̲r̲s̲i̲o̲n̲ 1̲.̲0̲ (version 3)
+# F̲o̲r̲ v̲e̲r̲s̲i̲o̲n̲ 1̲.̲0̲ (version 4)
 # 🄱🅈 🄳🄰🄽🅃🄴_🄽🄻
 
 # This PyPlace app allows you to help translate PyPlace in to your language!
@@ -133,7 +133,8 @@ while invalid_input == True:
 
 		info("The main menu")
 		ask_translation("Open a PyPlace app", "main_menu_option_1")
-		ask_translation("Download a PyPlace app", "main_menu_option_2")
+		ask_translation("Add a PyPlace app", "main_menu_option_2")
+		ask_translation("Check for app updates", "main_menu_option_5")
 		ask_translation("Open settings", "main_menu_option_3")
 		ask_translation("Exit PyPlace", "main_menu_option_4")
 		ask_translation("What do you want to do?", "main_menu_message_1")
@@ -215,11 +216,20 @@ while invalid_input == True:
 		ask_translation("[i]No apps to be deleted.[\]", "bulk_delete_message_1")
 		ask_translation("[g]Deleted [amount] app(s)![\]", "bulk_delete_message_2")
 
+		info("PyPlace App Updater")
+		ask_translation("[r]Error:[\] No apps that you have installed via the PyPlace Store support this system (yet)", "app_updater_error_1")
+		ask_translation("Would you like to check if a newer version might support it?", "app_updater_message_1")
+		ask_translation("No apps found. Please check back later.", "app_updater_message_2")
+		ask_translation("All apps are on the latest version!", "app_updater_message_4")
+
 		can_try_out = True
 	elif input_to_handle == "2":
 		invalid_input = False
 
 		ask_translation("PyPlace is a Python application that allows you [nl]to get a simple overview of your other Python [nl]applications, and it also allows you to easily [nl]install new ones!", "intro_2")
+
+		ask_translation("Add a PyPlace app", "main_menu_option_2")
+		ask_translation("Check for app updates", "main_menu_option_5")
 
 		ask_translation("Add local file", "download_file_option_4")
 		ask_translation("What is the name of the file you would like to add? [b]Note:[\] This [u]MUST[\] be in the current folder.", "download_file_message_11")
@@ -234,6 +244,12 @@ while invalid_input == True:
 		ask_translation("[g]Updater disabld![\]", "settings_updater_message_1_b")
 		ask_translation("[i]Checking for updates...[\]", "settings_updater_message_2")
 		ask_translation("[g]Checked for updates![\]", "settings_updater_message_2")
+
+		ask_translation("[r]Error:[\] No apps that you have installed via the PyPlace Store support this system (yet)", "app_updater_error_1")
+		ask_translation("Would you like to check if a newer version might support it?", "app_updater_message_1")
+		ask_translation("No apps found. Please check back later.", "app_updater_message_2")
+		ask_translation("All apps are on the latest version!", "app_updater_message_4")
+
 		can_try_out = False
 
 print(f"{bcolors.OKGREEN}Done!{bcolors.END} You have completed all the translations for this version!")
