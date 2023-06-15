@@ -20,17 +20,6 @@
 # We only recommend changing these settings
 # when you know what you are doing.
 
-# 𝗘𝗻𝗮𝗯𝗹𝗲 𝗼𝗿 𝗱𝗶𝘀𝗮𝗯𝗹𝗲 𝗰𝗵𝗲𝗰𝗸𝗶𝗻𝗴 𝗳𝗼𝗿 𝘂𝗽𝗱𝗮𝘁𝗲𝘀
-# Default: True
-# Possible options: True, False
-
-# Do you want to check for updates when the
-# program is ran? You can always check for
-# updates via the advanced options.
-# 𝗡𝗢𝗧𝗘: When Replit mode is enabled,
-# this setting is ignored.
-CheckForUpdates = True
-
 # 𝗘𝗻𝗮𝗯𝗹𝗲 𝗼𝗿 𝗱𝗶𝘀𝗮𝗯𝗹𝗲 𝗹𝗼𝗴𝘀
 # Default: True
 # Possible options: True, False
@@ -103,7 +92,7 @@ Order = "0fp0C"
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = 2
+OrderVersion = 3
 
 # ————————————————————————————
 # Below this line of text, everything
@@ -114,6 +103,7 @@ import os
 import re
 import sys
 import json
+import argparse
 import requests
 from os.path import exists
 
@@ -141,8 +131,8 @@ class bcolors:
 
 if exists("setup.json") == True:
 	with open('setup.json') as SetupFile:
-		_data = json.load(SetupFile)
-		PyCommand = _data["PythonCommand"]
+		SetupFile = json.load(SetupFile)
+		PyCommand = SetupFile["PythonCommand"]
 
 FileName = f"{os.path.splitext(os.path.basename(__file__))[0]}.py"
 FileNameWarning = False
@@ -580,12 +570,15 @@ URLToPythonFile)
 			NotAnswered4 = False
 
 def Settings():
-	print("What do you want to do?")
+# ! warp
+	print()
+	print(language["main_menu_message_1"])
 	print(f"""
 [1] {language['settings_option_1']}
 [2] {language['settings_option_2']}
 [3] {language['settings_option_3']}
-[4] {language['settings_option_4']}
+[4] {language['settings_option_6']}
+[5] {language['settings_option_4']}
 [{bcolors.FAIL}c{bcolors.END}] {language['settings_option_5']}
 """)
 	NotAnswered = True
@@ -669,8 +662,7 @@ def Settings():
 						r = requests.get(
 							"https://pyplace.dantenl.com/PyPlace-Latest.py", allow_redirects=True, headers=REQUEST_HEADERS)
 						if not r.ok:
-							print(
-								f"{bcolors.FAIL}Error:{bcolors.END} Could not get the PyPlace file! Status code: {r.status_code}")
+							print(language["update_error_2"].replace("[code]", r.status_code))
 							return
 						log("Updating main PyPlace file")
 						open('PyPlace.py', 'wb').write(r.content)
@@ -698,6 +690,71 @@ def Settings():
 				print(language['settings_error_1'])
 
 		elif Answer == "4":
+			# Manage updater
+
+			# Code to show enable/disable
+			with open('setup.json') as setupfile1:
+				setupfile = json.load(setupfile1)
+
+			try:
+				if setupfile["check_for_updates"] == True:
+					option_1 = language["settings_updater_option_1_b"]
+				else:
+					option_1 = language["settings_updater_option_1_a"]
+			except:
+				option_1 = language["settings_updater_option_1_b"]
+
+			print()
+			print(f"""Manage the updater
+
+[1] {option_1}
+[2] {language['settings_updater_option_2']}
+[{bcolors.FAIL}c{bcolors.END}] {language['cancel']}
+			""")
+
+			invalid_answer_options_submenu = True
+			while invalid_answer_options_submenu == True:
+				updater_options_answer = input(f"{language['settings_message_1']}: ").lower()
+				if updater_options_answer == "1":
+					invalid_answer_options_submenu = False
+					try:
+						if setupfile["check_for_updates"] == True:
+							# disable updater
+							setupfile["check_for_updates"] = False
+							with open('setup.json', 'w') as data_file:
+								data = json.dump(setupfile, data_file, indent=4, separators=(',', ': '))
+
+							print(language["settings_updater_message_1_b"])
+						else:
+							# enable updater
+							setupfile["check_for_updates"] = True
+							with open('setup.json', 'w') as data_file:
+								data = json.dump(setupfile, data_file, indent=4, separators=(',', ': '))
+
+							print(language["settings_updater_message_1_a"])
+					except:
+						# disable updater
+						setupfile["check_for_updates"] = False
+						with open('setup.json', 'w') as data_file:
+							data = json.dump(setupfile, data_file, indent=4, separators=(',', ': '))
+
+						print(language["settings_updater_message_1_b"])
+				
+				elif updater_options_answer == "2":
+					invalid_answer_options_submenu = False
+					print(language["settings_updater_message_2"])
+					UpdateCheck()
+					print(language["settings_updater_message_3"])
+				elif updater_options_answer == "c":
+					invalid_answer_options_submenu = False
+				else:
+					print(language["input_error"])
+
+
+
+
+
+		elif Answer == "5":
 			NotAnswered = False
 			with open('setup.json') as SetupFile:
 				data = json.load(SetupFile)
@@ -1030,11 +1087,13 @@ language = {
 		"download_file_message_9": f"It can now be opened via the \"Open a PyPlace app\" feature on the main menu!",
 		"download_file_message_10": f"What number app do you want to download?",
 		"download_file_message_11": f"What is the name of the file you would like to add? {bcolors.BOLD}Note:{bcolors.END} This {bcolors.UNDERLINE}MUST{bcolors.END} be in the current folder.",
+		"download_file_message_12": f"Are you sure that you want to download an external file?",
 
 		"settings_error_1": f"{bcolors.FAIL}Error:{bcolors.END} This is not available when PyPlace is executed on Replit. {bcolors.BOLD}You can download PyPlace instead{bcolors.END}",
 		"settings_option_1": "Delete an application",
 		"settings_option_2": "Change Python command",
 		"settings_option_3": "Restore to latest version",
+		"settings_option_6": "Manage updater settings",
 		"settings_option_4": "About",
 		"settings_option_5": "Back to main menu",
 		"settings_message_1": "Enter the number or letter for what you want to do",
@@ -1047,6 +1106,14 @@ language = {
 		"settings_message_8": f"Would you like to run it?",
 		"settings_message_9": f"{bcolors.INFO}Attempting to run PyPlace.py...{bcolors.END}",
 		"settings_message_10": f"Continuing with current version. {bcolors.BOLD}NOTE: {bcolors.END} Next time you start PyPlace.py, it will be on the latest version!",
+		"settings_updater_option_1_a": f"Enable checking for updates",
+		"settings_updater_option_1_b": f"Disable checking for updates",
+		"settings_updater_option_2": f"Check for updates now",
+		"settings_updater_message_1_a": f"{bcolors.OKGREEN}Updater enabled!{bcolors.END}",
+		"settings_updater_message_1_b": f"{bcolors.OKGREEN}Updater disabled!{bcolors.END}",
+		"settings_updater_message_2": f"{bcolors.INFO}Checking for updates...{bcolors.END}",
+		"settings_updater_message_3": f"{bcolors.OKGREEN}Checked for updates!{bcolors.END}",
+
 
 		"bulk_delete_message_1": f"{bcolors.INFO}No apps to be deleted.{bcolors.END}",
 		"bulk_delete_message_2": f"{bcolors.OKGREEN}Deleted [amount] app(s)!{bcolors.END}"
@@ -1063,13 +1130,97 @@ if exists("language.json"):
 		if key in language:
 			language[key] = value
 
+def downloadFromArguments(url):
+	if url:
+		URLToPythonFile = url
+		log("Testing URL with RegEx...")
+		RegExResult = re.search(
+						"^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$",
+								URLToPythonFile)
+		if RegExResult:
+			log("The input is a URL, testing for Python file extension...")
+			FileExtensionCheck2 = URLToPythonFile[-3:]
+			if FileExtensionCheck2 != ".py":
+				print(language["download_file_error_1"])
+				return
+			else:
+				invalidInput = True
+				while invalidInput == True:
+					confirmation = input(language["download_file_message_12"])
+					if confirmation.lower() == "y":
+						invalidInput = False
+						print(language["download_file_message_3"])
+						log(f"Retrieving file from {URLToPythonFile}")
+						r = requests.get(URLToPythonFile, allow_redirects=True,
+											headers=REQUEST_HEADERS)
+						if not r.ok:
+							print(language["download_file_error_2"].replace("[code]", r.status_code))
+							return
+
+						print(language["download_file_message_4"])
+						InvalidAnswer = True
+						while InvalidAnswer == True:
+							FileName = input(
+								f"{language['download_file_message_5']} ") or "PyPlace Installed App.py"
+							FileExtensionCheck3 = FileName[-3:]
+							if FileExtensionCheck3 != ".py":
+								FileName = f"{FileName}.py"
+
+							FileName = FileName.replace(" ", "-")
+							RegExResult2 = re.search(
+								"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName)
+							if RegExResult2:
+								FileName = re.sub(
+									"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName)
+								print(language["download_file_warning_1"].replace("[name]", FileName))
+								InvalidAnswer = False
+							else:
+								InvalidAnswer = False
+
+							if exists(FileName):
+								print(language["download_file_error_3"].replace("name", FileName))
+								InvalidAnswer = True
+
+						Name = input(
+							f"{language['download_file_message_6']} ") or "PyPlace Installed App"
+
+						print(language["download_file_message_7"])
+
+						open(FileName, 'wb').write(r.content)
+
+						with open('applications.json') as ApplicationsFile:
+							data2 = json.load(ApplicationsFile)
+
+						data2["apps"].update(
+							{
+								f"{Name}": {
+									"name": f"{Name}",
+									"file_name": f"{FileName}",
+								}
+							}
+						)
+
+						log("Appending to applications.json")
+						with open("applications.json", 'w') as json_file:
+							json.dump(data2, json_file, indent=4, separators=(',', ': '))
+						print(language["download_file_message_8"])
+						print(language["download_file_message_9"])
+		else:
+			print(language["download_file_error_4"])
+
+# Arguments to make installing easier
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser()
+	parser.add_argument('url', help='URL to download from', nargs="?")
+	args = parser.parse_args()
+
+	downloadFromArguments(args.url)
+
 
 print(language["intro_1"])
 print()
 print(language["intro_2"])
-print(language["intro_3"])
-print(language["intro_4"])
-print(language["intro_5"])
+
 print()
 if ReplitMode == True:
 	print(language["replit_warning"])
@@ -1084,8 +1235,7 @@ if exists("setup.json") == True:
 		log("applications.json does not exist, creating new file...")
 		AppDict = {
 			"_NOTE": "DO NOT DELETE THIS FILE! This file is crucial for downloading, opening and deleting apps, yet you deleted it :(",
-			"apps": {
-			}
+			"apps": {}
 		}
 
 		with open("applications.json", 'w') as json_file:
@@ -1093,10 +1243,20 @@ if exists("setup.json") == True:
 				indent=4,
 				separators=(',', ': '))
 		log("applications.json created.")
-	if CheckForUpdates != False:
+
+	# Check for updates
+	with open('setup.json') as SetupFile:
+		SetupFile = json.load(SetupFile)
+	try:
+		CheckForUpdates = SetupFile["check_for_updates"]
+	except:
+		CheckForUpdates = True
+	if CheckForUpdates == True:
 		UpdateCheck()
+
 	while DoINeedToRun == True:
 		PyPlaceRegular()
+
 else:
 	log("setup.json does not exist, launching setup...")
 	print(language["setup_1"])
@@ -1134,7 +1294,3 @@ else:
 	FileName = f"{os.path.splitext(os.path.basename(__file__))[0]}.py"
 	os.system(f"{PythonCommand} {FileName}")
 	sys.exit(1)
-	# Read content of setup.json key
-	# with open('setup.json') as SetupFile:
-	#     data = json.load(SetupFile)
-	#     print(data["SetupVersion"])
