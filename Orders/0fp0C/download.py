@@ -72,6 +72,17 @@ ReplitMode = False
 # except for testing purposes.
 Version = 1.0
 
+# 𝗩𝗲𝗿𝘀𝗶𝗼𝗻 𝗹𝗶𝘀𝘁
+# Default: [{Version}] (changes every version)
+# Possible options: any array of numbers
+
+# This is a list of translations that are 100%
+# compatible with this version. Changing this
+# list won't really break PyPlace, it just won't
+# give an error when a wrong translation is added
+
+CompatibleVersionList = [Version]
+
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿
 # Default: None (changes every Order)
 # Possible options: None, any string
@@ -92,7 +103,7 @@ Order = "0fp0C"
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = 1
+OrderVersion = 2
 
 # ————————————————————————————
 # Below this line of text, everything
@@ -150,6 +161,9 @@ def log(message):
 
 def error(error_msg):
 	print(f"{bcolors.FAIL}Error:{bcolors.END} {error_msg}")
+
+def warn(warning_msg):
+	print(f"{bcolors.WARNING}Warning:{bcolors.END} {warning_msg}")
 
 
 def info(info_msg):
@@ -944,16 +958,8 @@ def PyPlaceRegular():
 
 print("————————————————————————————")
 log("Loading language file...")
-if exists("language.json"):
-	with open('language.json') as LanguageFile:
-		language = json.load(LanguageFile)
-	if language["version"] != Version:
-		error("The language pack you are attempting to load is not for the current version. Please update or remove your language.json file to start up PyPlace.")
-		sys.exit(0)
-	log("Language file loaded.")
-else:
-	log("Language file does not exist. Creating language file...")
-	language = {
+
+language = {
 		"version": 1.0,
 
 		"input_error": f"{bcolors.FAIL}Error:{bcolors.END} I'm not sure what you mean with that!",
@@ -1045,10 +1051,18 @@ else:
 		"bulk_delete_message_1": f"{bcolors.INFO}No apps to be deleted.{bcolors.END}",
 		"bulk_delete_message_2": f"{bcolors.OKGREEN}Deleted [amount] app(s)!{bcolors.END}"
 	}
-	with open("language.json", 'w') as json_file:
-		json.dump(language, json_file,
-			indent=4,
-			separators=(',', ': '))
+
+if exists("language.json"):
+	log("Reading language file")
+	with open('language.json') as LanguageFile:
+		language_2 = json.load(LanguageFile)
+	if language_2["version"] not in CompatibleVersionList:
+		warn("The language pack you are attempting to load is not for the current version. The translation will not be complete.")
+	log("Setting keys that exist to prevent incomplete translations")
+	for key, value in language_2.items():
+		if key in language:
+			language[key] = value
+
 
 print(language["intro_1"])
 print()
