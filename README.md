@@ -1,2 +1,2 @@
 # PyPlace
-Launch your Python files.
+## Manage your Python apps with ease
