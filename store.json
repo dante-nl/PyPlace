@@ -3,7 +3,8 @@
 		"Simple Password Gen": {
 			"name": "Simple Password Generator",
 			"url": "https://pyplace.dantenl.com/store%20files/password-gen.py",
-			"author": "dante_nl"
+			"author": "dante_nl",
+			"version": "1.0.0"
 		},
 		"Rock, paper, scissors": {
 			"name": "Rock, paper, scissors",
