@@ -59,7 +59,7 @@ ReplitMode = False
 # This is the version of PyPlace and is
 # absolutely not recommended to change,
 # except for testing purposes.
-Version = 1.0
+Version = 0.91
 
 # 𝗩𝗲𝗿𝘀𝗶𝗼𝗻 𝗹𝗶𝘀𝘁
 # Default: [{Version}] (changes every version)
@@ -214,8 +214,8 @@ def UpdateCheck():
 	elif data["version"] > Version:
 		print("————————")
 		print(language["update_message_1"])
-		substep1 = language["update_message_2"].replace("[version]", Version)
-		print(substep1.replace("[version_latest]", data["version"]))
+		substep1 = language["update_message_2"].replace("[version]", str(Version))
+		print(substep1.replace("[version_latest]", str(data["version"])))
 		print(f"""{language["update_message_3"]}
 {data["release_notes"]}
 		""")
