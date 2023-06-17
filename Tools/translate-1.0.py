@@ -13,7 +13,7 @@
 # ░░░██║░░░██║░░██║██║░░██║██║░╚███║██████╔╝███████╗██║░░██║░░░██║░░░██║╚█████╔╝██║░╚███║██████╔╝
 # ░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═════╝░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░╚════╝░╚═╝░░╚══╝╚═════╝░
 
-# F̲o̲r̲ v̲e̲r̲s̲i̲o̲n̲ 1̲.̲0̲ (version 4)
+# F̲o̲r̲ v̲e̲r̲s̲i̲o̲n̲ 1̲.̲0̲ (version 4.1)
 # 🄱🅈 🄳🄰🄽🅃🄴_🄽🄻
 
 # This PyPlace app allows you to help translate PyPlace in to your language!
@@ -217,7 +217,7 @@ while invalid_input == True:
 		ask_translation("[g]Deleted [amount] app(s)![\]", "bulk_delete_message_2")
 
 		info("PyPlace App Updater")
-		ask_translation("[r]Error:[\] No apps that you have installed via the PyPlace Store support this system (yet)", "app_updater_error_1")
+		ask_translation("[r]Error:[\] Some apps that you have installed via the PyPlace Store don't support checking for updates.", "app_updater_error_1")
 		ask_translation("Would you like to check if a newer version might support it?", "app_updater_message_1")
 		ask_translation("No apps found. Please check back later.", "app_updater_message_2")
 		ask_translation("All apps are on the latest version!", "app_updater_message_4")
@@ -245,7 +245,7 @@ while invalid_input == True:
 		ask_translation("[i]Checking for updates...[\]", "settings_updater_message_2")
 		ask_translation("[g]Checked for updates![\]", "settings_updater_message_2")
 
-		ask_translation("[r]Error:[\] No apps that you have installed via the PyPlace Store support this system (yet)", "app_updater_error_1")
+		ask_translation("[r]Error:[\] Some apps that you have installed via the PyPlace Store don't support checking for updates.", "app_updater_error_1")
 		ask_translation("Would you like to check if a newer version might support it?", "app_updater_message_1")
 		ask_translation("No apps found. Please check back later.", "app_updater_message_2")
 		ask_translation("All apps are on the latest version!", "app_updater_message_4")
