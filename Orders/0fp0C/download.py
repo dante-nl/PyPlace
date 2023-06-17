@@ -92,7 +92,7 @@ Order = "0fp0C"
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = 4.2
+OrderVersion = 4.3
 
 # ————————————————————————————
 # Below this line of text, everything
@@ -994,16 +994,17 @@ def ExternalAppUpdater():
 				for app in StoreRequestJSON:
 					for local_app in AppFile:
 						if "StoreApp" in AppFile[local_app] and AppFile[local_app]["StoreApp"] == "true":
+							if "version" not in AppFile[local_app]:
 						# log(app)
 						# log(len(AppFile[local_app]))
 						# log(AppFile[local_app]["name"])
 						# log(StoreRequestJSON[app]["name"])
-							if AppFile[local_app]["name"] == StoreRequestJSON[app]["name"]:
-								try:
-									StoreRequestJSON[app]["version"]
-									found_apps.append(StoreRequestJSON[app]["name"])
-								except:
-									pass
+								if AppFile[local_app]["name"] == StoreRequestJSON[app]["name"]:
+									try:
+										StoreRequestJSON[app]["version"]
+										found_apps.append(StoreRequestJSON[app]["name"])
+									except:
+										pass
 				if len(found_apps) == 0:
 					print(language["app_updater_message_2"])
 					return
@@ -1290,8 +1291,8 @@ language = {
 		"bulk_delete_message_1": f"{bcolors.INFO}No apps to be deleted.{bcolors.END}",
 		"bulk_delete_message_2": f"{bcolors.OKGREEN}Deleted [amount] app(s)!{bcolors.END}",
 
-		"app_updater_error_1": f"{bcolors.FAIL}Error:{bcolors.END} No apps that you have installed via the PyPlace Store support this system (yet)",
-		"app_updater_message_1": f"Some of your apps do not support the updater. Would you like to check if a newer version might support it? ",
+		"app_updater_error_1": f"{bcolors.FAIL}Error:{bcolors.END} Some apps that you have installed via the PyPlace Store don't support checking for updates.",
+		"app_updater_message_1": f"Would you like to check if a newer version might support it?",
 		"app_updater_message_2": f"No apps found. Please check back later",
 		"app_updater_message_3": f"Would you like to update the following app(s) to the latest version?",
 		"app_updater_message_4": f"All apps are on the latest version!"
