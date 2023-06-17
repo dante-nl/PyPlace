@@ -92,7 +92,7 @@ Order = "0fp0C"
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = 4.3
+OrderVersion = "prerelease1"
 
 # ————————————————————————————
 # Below this line of text, everything
@@ -163,7 +163,7 @@ def downloadFromStore(OfficialName, FileName, StoreRequestJSON, Version):
 	"""Download an application from the PyPlace store."""
 	Name = StoreRequestJSON["apps"][OfficialName]["name"]
 	Author = StoreRequestJSON["apps"][OfficialName]["author"]
-	log(f"Attempting to download and install \"{Name}\"...")
+	log(f"Attempting to update \"{Name}\"...")
 	AppRequest = requests.get(
 		StoreRequestJSON['apps'][OfficialName]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
 	if not AppRequest.ok:
@@ -174,9 +174,15 @@ def downloadFromStore(OfficialName, FileName, StoreRequestJSON, Version):
 		with open('applications.json') as ApplicationsFile1:
 				data3 = json.load(ApplicationsFile1)
 
+				title = None
+				for app in data3["apps"]:
+					if data3["apps"][app]["name"] == Name:
+						title = app
+						log(title)
+
 				data3["apps"].update(
 					{
-						f"{Name}": {
+						f"{title}": {
 							"name": f"{Name}",
 							"file_name": f"{FileName}",
 							"author": f"{Author}",
@@ -942,11 +948,11 @@ def ExternalAppUpdater():
 		apps_with_updates = []
 		for app in AppFile:
 			for store_app in StoreRequestJSON:
-				if "StoreApp" in AppFile[key] and AppFile[key]["StoreApp"] == "true":
-					if "version" in AppFile[key] and "version" in StoreRequestJSON[store_app]:
-						if AppFile[key]["name"] == StoreRequestJSON[store_app]["name"]:
-							if str(AppFile[key]["version"]) != str(StoreRequestJSON[store_app]["version"]):
-								apps_with_updates.append(StoreRequestJSON[app]["name"])
+				if "StoreApp" in AppFile[app] and AppFile[app]["StoreApp"] == "true":
+					if "version" in AppFile[app] and "version" in StoreRequestJSON[store_app]:
+						if AppFile[app]["name"] == StoreRequestJSON[store_app]["name"]:
+							if str(AppFile[app]["version"]) != str(StoreRequestJSON[store_app]["version"]):
+								apps_with_updates.append(StoreRequestJSON[store_app]["name"])
 
 		if len(apps_with_updates) == 0:
 			print(language["app_updater_message_4"])
@@ -1024,6 +1030,8 @@ def ExternalAppUpdater():
 							for store_app in StoreRequestJSON:
 								if StoreRequestJSON[store_app]["name"] == app:
 									app_version = StoreRequestJSON[store_app]["version"]
+									print(store_app)
+									print(app)
 									official_name = store_app
 									break
 							for local_app in AppFile:
