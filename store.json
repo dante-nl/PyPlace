@@ -30,7 +30,8 @@
 		"Calculator": {
 			"name": "Simple Calculator",
 			"url": "https://pyplace.dantenl.com/store%20files/calculator.py",
-			"author": "dante_nl"
+			"author": "dante_nl",
+			"version": "2.0.0"
 		},
 		"dictiona.py": {
 			"name": "dictiona.py — a dictionary in Python",
