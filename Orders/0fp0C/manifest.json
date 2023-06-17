@@ -3,6 +3,6 @@
   "description": "Adds support for language packs, PyPlace Bulk Delete and local file installs.",
   "type": "overwrite",
   "min-version": "0.7",
-  "expired": false,
+  "expired": true,
   "downloads": ["https://pyplace.dantenl.com/orders/0fp0C/download.py"]
 }
