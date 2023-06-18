@@ -42,7 +42,7 @@ SLEEP_TIME = 0.2
 API_KEY = None
 # ^ If you want to save it. Note that with every update, this is reset.
 
-SYSTEM_PROMPT = "You are a translator who translates any given sentence to a different language. You are translating a computer program. You translate to [language]. Do not translate anything in square brackets."
+SYSTEM_PROMPT = "You are a translator who translates any given sentence to a different language. You are translating a computer program. You translate to [language]. Do not translate or remove anything in square brackets."
 # ^ The prompt ChatGPT should work with to translate your sentences.
 
 TOKEN_LIMIT = 1000
@@ -248,7 +248,11 @@ For PyPlace version: 1.0""")
 			if API_KEY == "":
 				print("Please enter a key.")
 			else:
-				start_translate(API_KEY)
+				# Create an event loop
+				loop = asyncio.get_event_loop()
+
+				# Run the coroutine within the event loop
+				loop.run_until_complete(start_translate(API_KEY))
 	else:
 		invalid_input = False
 		info("Continuing with API key set in Python file.")
@@ -263,7 +267,7 @@ For PyPlace version: 1.0""")
 async def start_translate(api_key):	
 	# Language
 	print("What language do you want to translate to? This can be anything like French, but also something like \"A language spoken in Belgium\". It could also be something like Klingon.")
-	language_to_translate_to = input("> ")
+	language_to_translate_to = input("I want to translate to: ")
 
 	language_len = len(language)-1
 	# subtract 1 because version is also part of dictionary
