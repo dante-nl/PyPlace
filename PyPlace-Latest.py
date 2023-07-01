@@ -53,13 +53,13 @@ DoINeedToRun = True
 ReplitMode = False
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
-# Default: 0.7 (changes every version)
+# Default: 1.1 (changes every version)
 # Possible options: any number
 
 # This is the version of PyPlace and is
 # absolutely not recommended to change,
 # except for testing purposes.
-Version = 0.91
+Version = 1.1
 
 # 𝗩𝗲𝗿𝘀𝗶𝗼𝗻 𝗹𝗶𝘀𝘁
 # Default: [{Version}] (changes every version)
@@ -70,7 +70,7 @@ Version = 0.91
 # list won't really break PyPlace, it just won't
 # give an error when a wrong translation is added
 
-CompatibleVersionList = [Version]
+CompatibleVersionList = [Version, 1.0]
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿
 # Default: None (changes every Order)
@@ -1197,17 +1197,14 @@ print("————————————————————————�
 log("Loading language file...")
 
 language = {
-		"version": 1.0,
+		"version": Version,
 
 		"input_error": f"{bcolors.FAIL}Error:{bcolors.END} I'm not sure what you mean with that!",
 		"back_to_menu": "Press [ENTER] to return to the main menu.",
 		"cancel": "Cancel",
 
 		"intro_1": f"Welcome to {bcolors.BOLD}PyPlace{bcolors.END}",
-		"intro_2": "PyPlace is a Python application that allows you",
-		"intro_3": "to get a simple overview of your other Python",
-		"intro_4": "applications, and it also allows you to easily",
-		"intro_5": "install new ones!",
+		"intro_2": "PyPlace is a Python application that allows you \nto get a simple overview of your other Python \napplications, and it also allows you to easily \ninstall new ones!",
 
 		"replit_warning": f"{bcolors.WARNING}WARNING:{bcolors.END} It appears that you're running this on the Replit page. Not everything might work properly because of different file names! We recommend downloading PyPlace and running it for yourself.",
 		"file_name_warning": f"{bcolors.WARNING}WARNING:{bcolors.END} It appears that you are running this from another file that is not called \"pyplace.py\". \nThis means you can not correctly restore and update PyPlace. We recommend changing it to \"pyplace.py\".",
