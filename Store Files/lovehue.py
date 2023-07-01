@@ -14,7 +14,7 @@ import requests
 # from PIL import Image, ImageDraw
 
 
-VERSION = 1.0
+VERSION = 1.2
 
 print()
 print()
@@ -33,33 +33,25 @@ try:
 	import cv2
 	optional_requirements_satisfied += 1
 except:
-	# print("Error: Please download opencv-python first. You can do this by doing pip install opencv-python --upgrade")
 	pass
-	# sys.exit(0)
 
 try:
 	import numpy as np
 	optional_requirements_satisfied += 1
 except:
-	# print("Error: Please download numpy first. You can do this by doing pip install numpy --upgrade")
 	pass
-	# sys.exit(0)
 
 try:
 	import pyautogui
 	optional_requirements_satisfied += 1
 except:
-	# print("Error: Please download pyautogui first. You can do this by doing pip install pyautoguis --upgrade")
 	pass
-	# sys.exit(0)
 
 try:
 	from PIL import Image, ImageDraw, ImageColor
 	optional_requirements_satisfied += 1
 except:
-	# print("Error: Please download Pillow first. You can do this by doing pip install Pillow --upgrade")
 	pass
-	# sys.exit(0)
 	
 
 if optional_requirements_satisfied == 4:
@@ -208,13 +200,6 @@ def how_dark(color):
 	"""
 	  # Convert the HEX color to RGB
 	r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
-	# brightness = (0.212 * r + 0.701 * g + 0.087 * b) / 255
-	# brightness = float(((r * g * b) ^ (1/3)) / 255)
-	# print(type(r, g, b))
-	# print(type(r))
-	# print(type(g))
-	# print(type(b))
-
 
 	denominator = 255 * (3) ** (1/2)
 	brightness = (r**2 + g**2 + b**2) ** (1/2) / denominator
@@ -232,27 +217,8 @@ def how_dark(color):
 		return 2
 	elif brightness >= 0.35 and brightness < 1:
 		return 3
-	# elif brightness >= .7 and brightness <= 1:
-	# 	return 3
 	else:
 		return 3
-	# if brightness < 90:
-	# 	return 1
-	# elif brightness >= 90 and brightness < 170:
-	# 	return 2
-	# elif brightness >= 170 and brightness < 250:
-	# 	return 3
-	# else:
-	# 	return 4
-
-# Test the function
-# print(how_dark("#000000"))  # 1 (black)
-# print(how_dark("#808080"))  # 2 (gray)
-# print(how_dark("#FFFFFF"))  # 3 (white)
-# print(how_dark("#FF0000"))  # 2 (red)
-# print(how_dark("#F1B0AE"))  # 2 (dark pink)
-
-# sys.exit(0)
 
 if exists("data.json"):
 	with open('data.json') as dataFile:
@@ -262,14 +228,21 @@ if exists("data.json"):
 			error("Could not find username")
 			sys.exit(0)
 else:
-	try:
-		discover = Discover()
-		discover = json.loads(discover.find_hue_bridge_mdns(timeout=5))
-		HUE_IP = discover[0]["internalipaddress"]
-		USERNAME = Hue.connect(bridge_ip=HUE_IP)
-	except:
-		info("Please press the link button and run LoveHue again.")
-		sys.exit(0)
+	link_button_pressed = False
+	while link_button_pressed == False:
+		try:
+			ok2("Link button pressed!")
+			discover = Discover()
+			discover = json.loads(discover.find_hue_bridge_mdns(timeout=5))
+			HUE_IP = discover[0]["internalipaddress"]
+			USERNAME = Hue.connect(bridge_ip=HUE_IP)
+			link_button_pressed = True
+		except KeyboardInterrupt:
+			error("Interrupted.")
+			sys.exit(0)
+		except:
+			info("Please press the link button. Press ctrl+C to cancel")
+			time.sleep(5)
 
 	data_dict = {}
 	data_dict["username"] = USERNAME
@@ -278,10 +251,8 @@ else:
 	data_dict_str = json.dumps(data_dict, indent=4, separators=(',', ': '))
 	with open('data.json', 'w') as dataJSON:
 		dataJSON.write(data_dict_str)
-		# log("File created: setup.json")
 try:
 	discover = Discover()
-	# print(discover)
 	discover = json.loads(discover.find_hue_bridge())
 	HUE_IP = discover[0]["internalipaddress"]
 except:
@@ -293,8 +264,6 @@ except:
 	except:
 		error("Could not connect to Hue bridge.")
 		sys.exit(0)
-
-# print(USERNAME)
 
 hue = Hue(bridge_ip=HUE_IP, username=USERNAME)
 
@@ -311,17 +280,10 @@ while validInput == False:
 		error("You have to enter either 1 or 2.");
 def selectLight():
 	"""Gives the option for selecting lights. Returns the selected light as light/group object."""
-	if(option == "1"):
+	if option == "1":
 		lights = hue.get_groups()
 	else:
 		lights = hue.get_lights()
-	# print(rooms.lights)
-	# for room in rooms:
-	# 	print(room.name)
-	# print()
-	# print()
-	# print()
-	# print(lights)
 
 	total_number = 1
 	light_list = []
@@ -331,7 +293,7 @@ def selectLight():
 		light_list.append(light)
 
 
-	selected = input("What light do you want to do? ")
+	selected = input("What light do you want to use? ")
 	return light_list[int(selected) -1]
 
 def lightSelection():
@@ -383,23 +345,13 @@ def animationSelection(lamp):
 	except:
 		error("Invalid input")
 		return False
-	print(lamp.bri)
 	if selected_option == 1:
-		# repeat_times = input("How many times to repeat? ")
 		time_between = input("How long between each color change in seconds? ")
 
 		try:
-			# int(repeat_times)
-			# int(time_between)
 			invalid_input = True
 			execute_code = True
 			while invalid_input == True:
-				# if int(time_between) * int(repeat_times) < 60:
-				# 	time_total = f"{round(int(time_between) * int(repeat_times))} second(s)"
-				# elif int(time_between) * int(repeat_times) >= 60:
-				# 	time_total = f"{round(int(time_between) * int(repeat_times) / 60)} minute(s)"
-				# elif int(time_between) * int(repeat_times) / 60 >= 60:
-				# 	time_total = f"{round(int(time_between) * int(repeat_times) / 60)} hour(s)"
 				input_value = input(
 					f"This will take stop when you press ctrl+C. Press [ENTER] to confirm or c to cancel. ").lower()
 				if input_value != "c":
@@ -443,16 +395,8 @@ def animationSelection(lamp):
 		execute_code = True
 
 		try:
-			# int(repeat_times)
-			# int(time_between)
 			invalid_input = True
 			while invalid_input == True:
-				# if int(time_between) * int(repeat_times) < 60:
-				# 	time_total = f"{round(int(time_between) * int(repeat_times))} second(s)"
-				# elif int(time_between) * int(repeat_times) >= 60:
-				# 	time_total = f"{round(int(time_between) * int(repeat_times) / 60)} minute(s)"
-				# elif int(time_between) * int(repeat_times) / 60 >= 60:
-				# 	time_total = f"{round(int(time_between) * int(repeat_times) / 60)} hour(s)"
 				input_value = input(
 					f"This will take stop when you press ctrl+C. Press [ENTER] to confirm or c to cancel. ").lower()
 				if input_value != "c":
@@ -491,23 +435,10 @@ def animationSelection(lamp):
 			old_brightness = lamp.bri
 			if old_brightness <= 50:
 				old_brightness = 254
-			# print(old_brightness)
-			# print(lamp.bri)
 			execute_code = True
 			if input_value != "c":
 				while execute_code == True:
 					try:
-						# If the lid is closed, turn lights off and stop animation
-						try:
-							if(lid_closed() == True):
-								print()
-								lamp.off(transition=20)
-								ok2("Animation completed.")
-								input("Press [ENTER] to go home")
-								execute_code = False
-						except:
-							pass
-						# print(len(images))
 						# If 3 images collected, do stuff
 						if len(images) == 3:
 							result = Image.new('RGBA', images[0].size)
@@ -557,22 +488,13 @@ def animationSelection(lamp):
 						try:
 							img = pyautogui.screenshot()
 							images.append(img.convert("RGBA"))
-							time.sleep(1)
+							time.sleep(0.3)
 						except KeyboardInterrupt:
 							print()
 							ok2("Animation completed.")
 							input("Press [ENTER] to go home")
 							execute_code = False
 							pass
-						# except:
-						# 	pass
-							# Make screenshot, append to list
-						# except Exception as e:
-						# 	# In rare occasions, it might produce an error.
-						# 	lamp.on(transition=1)
-						# 	lamp.set_color(hexa="#FF0000", transition=20)
-						# 	print(e)
-						# 	time.sleep(1)
 					except KeyboardInterrupt:
 						# User chose to stop animation
 						print()
@@ -580,11 +502,6 @@ def animationSelection(lamp):
 						input("Press [ENTER] to go home")
 						execute_code = False
 						pass
-						# flicker_light(lamp)
-					# except Exception as e:
-					# 	error(e)
-					# 	images = []
-					# 	# pass		
 
 			else:
 				invalid_input = False
@@ -642,7 +559,7 @@ def animationSelection(lamp):
 							try:
 								animation_json["colors"][current_item]["brightness"]
 							except KeyError:
-								animation_json["colors"][current_item]["brightness"] = lamp.bri 
+								animation_json["colors"][current_item]["brightness"] = lamp.bri / 254 * 100
 							# ^ If brightness value is not set, continue with current brightness
 							
 							try:
@@ -673,10 +590,8 @@ def animationSelection(lamp):
 								# If we're at the end of the animation, reset to beginning
 							except KeyError:
 								pass
-						# info(f"{round((current_number / int(repeat_times)) * 100)}%")
 						# Printing progress
 						current_number += 1
-						# Add lid close
 					except KeyboardInterrupt:
 						# If manually stopped
 						print()
@@ -792,7 +707,7 @@ while invalid_option == True:
 			if brightness_percent <= 100:
 				if brightness_percent > 0:
 					factor = brightness_percent / 100
-					print(factor*254)
+					# print(factor*254)
 					selected_light.set_brightness(round(factor * 254))
 				else:
 					error("Could not set brighness")
