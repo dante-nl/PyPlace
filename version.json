@@ -1,4 +1,4 @@
 {
-	"version": 1.0,
-	"release_notes": "A bunch of new features were added: \n- PyPlace can now be translated. Please check the Discord server (discord.gg/EXqsHeaXE3) for more information about translating yourself, or downloading other languages. You can alos use the PyPlace AI Translate app from the store \n- PyPlace apps can now be updated from PyPlace. This makes it easier for both developers and users to keep their files on the latest version \n- PyPlace Bulk Delete is now built in, you can easily delete multiple apps at once now \n- You can now add local files. Please note that they must be in your current folder. \n\nApart from that, various bugs have also been squashed to give you the most optimal experience. Please continue to enjoy PyPlace"
+	"version": 1.1,
+	"release_notes": "— Updated a few translation related things"
 }
