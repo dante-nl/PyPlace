@@ -1,8 +1,28 @@
-	
-#// import keyboard
-#// ^ pip install keyboard
+# ██╗░░░░░░█████╗░██╗░░░██╗███████╗██╗░░██╗██╗░░░██╗███████╗
+# ██║░░░░░██╔══██╗██║░░░██║██╔════╝██║░░██║██║░░░██║██╔════╝
+# ██║░░░░░██║░░██║╚██╗░██╔╝█████╗░░███████║██║░░░██║█████╗░░
+# ██║░░░░░██║░░██║░╚████╔╝░██╔══╝░░██╔══██║██║░░░██║██╔══╝░░
+# ███████╗╚█████╔╝░░╚██╔╝░░███████╗██║░░██║╚██████╔╝███████╗
+# ╚══════╝░╚════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝░╚═════╝░╚══════╝
 
-import re
+# 🄱🅈 🄳🄰🄽🅃🄴_🄽🄻
+
+# Welcome to LoveHue! This is a Python program that 
+# allows you to play (and make) various animations
+# directly from Python!
+# Made possible thanks to the huesdk library!
+# https://github.com/AlexisGomes/huesdk
+
+# It is recommended to use the exact same 
+# versions of the libraries, as something might
+# have broken thanks to an update.
+
+# We recommend using PyPlace: it's easy to manage LoveHue
+# and allows for simple updating
+# 
+
+# —————————————————————
+
 import time
 import sys
 import json
@@ -11,65 +31,48 @@ import os
 import random
 
 import requests
-# from PIL import Image, ImageDraw
 
-
-VERSION = 1.2
+VERSION = 1.3
 
 print()
 print()
 print()
 
+# check for requirements and optionals
 try:
 	from huesdk import Hue
 	from huesdk import Discover
 	#* ^ pip install huesdk
 except:
-	print("Error: Please download huesdk first. You can do this by doing: pip install huesdk --upgrade")
+	print("Error: Please download huesdk first. You can do this by doing: pip install huesdk==1.7")
 	sys.exit(0)
 
 optional_requirements_satisfied = 0
-try:
-	import cv2
-	optional_requirements_satisfied += 1
-except:
-	pass
 
 try:
-	import numpy as np
-	optional_requirements_satisfied += 1
-except:
-	pass
-
-try:
+	# pyautogui is required to make a screenshot
 	import pyautogui
 	optional_requirements_satisfied += 1
 except:
 	pass
 
 try:
-	from PIL import Image, ImageDraw, ImageColor
+	# Pillow is used to analyze the image
+	from PIL import Image
 	optional_requirements_satisfied += 1
 except:
 	pass
 	
 
-if optional_requirements_satisfied == 4:
+if optional_requirements_satisfied == 2:
 	ALL = True
 else:
 	ALL = False
-	print("""You are unable to use all features. You can fix this by running the following commands.
+	print("""You are unable to simulate screen. You can fix this by running the following commands.
 
-pip install opencv-python --upgrade
-pip install numpy --upgrade
-pip install pyautogui --upgrade
-pip install Pillow --upgrade""")
-
-
-def lid_closed():
-	"""Not working. Always returns false"""
-	return False
-
+pip install pyautogui==0.9.54
+pip install Pillow==9.5.0""")
+	print()
 
 class colors:
 	LOG = '\033[95m'
@@ -361,22 +364,11 @@ def animationSelection(lamp):
 					current_loop = 0
 					try:
 						while execute_code == True:
-							try:
-								if(lid_closed() == True):
-									print()
-									lamp.off(transition=20)
-									ok2("Animation completed.")
-									input("Press [ENTER] to go home")
-									execute_code = False
-							except Exception as e:
-								error(e)
-								pass
 							current_loop += 1
 							color = randomHEX()
 							lamp.on()
 							lamp.set_color(hexa=color, transition=10)
 							time.sleep(int(time_between))
-							# info(f"{round((current_loop / int(repeat_times)) * 100)}%")
 					except KeyboardInterrupt:
 						print()
 						ok2("Animation completed.")
@@ -390,7 +382,6 @@ def animationSelection(lamp):
 		except:
 			error("Invalid number")
 	elif selected_option == 2:
-		# repeat_times = input("How many times to repeat? ")
 		time_between = input("How long between each brightness change in seconds? ")
 		execute_code = True
 
@@ -404,15 +395,6 @@ def animationSelection(lamp):
 					info("Animation started.")
 					try:
 						while execute_code == True:
-							try:
-								if(lid_closed() == True):
-									print()
-									lamp.off(transition=20)
-									ok2("Animation completed.")
-									input("Press [ENTER] to go home")
-									execute_code = False
-							except:
-								pass
 							lamp.set_brightness(round(random.randint(1, 254)))
 							time.sleep(int(time_between))
 					except KeyboardInterrupt:
@@ -463,9 +445,10 @@ def animationSelection(lamp):
 							# Getting how dark the color is and changing lights accordingly
 							if how_dark(hex_color) == 1:
 								# Extremely dark
-								lamp.set_color(hexa="00010a", transition=20)
-								lamp.on(transition=1)
-								lamp.set_brightness(round(old_brightness / 3), transition=1)
+								# lamp.set_color(hexa="00010a", transition=20)
+								# lamp.on(transition=1)
+								# lamp.set_brightness(round(old_brightness / 3), transition=1)
+								lamp.off(transition=20)
 							elif how_dark(hex_color) == 2:
 								# Dark
 								lamp.set_color(hexa=hex_color, transition=20)
@@ -519,7 +502,6 @@ def animationSelection(lamp):
 			return False
 			# Invalid file
 
-		# repeat_times = input("How many times repeat?")
 		total_time = 0
 		current_item = 0
 		# V calculating how long it will take
@@ -544,10 +526,8 @@ def animationSelection(lamp):
 					if lamp.is_on == False:
 						lamp.on()
 					try:
-						# for _ in range(int(repeat_times)):
 						for __ in range(max_lenght):
 							# Checking what data is set
-
 							try:
 								animation_json["colors"][current_item]["color"]
 								from_memory = True
@@ -590,7 +570,6 @@ def animationSelection(lamp):
 								# If we're at the end of the animation, reset to beginning
 							except KeyError:
 								pass
-						# Printing progress
 						current_number += 1
 					except KeyboardInterrupt:
 						# If manually stopped
@@ -607,7 +586,7 @@ def UpdateCheck():
 	log("Checking for latest version...")
 	response = requests.get("http://pyplace.dantenl.com/Store%20Files/lovehueversion.json")
 	if response.status_code != 200:
-		print(f"{colors.FAIL}Error:{colors.END} Could not check for updates! Response code: {response.status_code}")
+		error(f"Could not check for updates! Response code: {response.status_code}")
 		return
 
 	log("Comparing versions...")
@@ -616,7 +595,7 @@ def UpdateCheck():
 	data = json.loads(RequestText)
 
 	if data["version"] < VERSION:
-		print(f"{colors.WARNING}WARNING:{colors.END} Your current version seems to be newer than the latest version that is released!")
+		warning("Your current version seems to be newer than the latest version that is released!")
 	elif data["version"] > VERSION:
 		print("————————")
 		print(f"{colors.BOLD}UPDATE AVAILABLE!{colors.END}")
@@ -707,7 +686,6 @@ while invalid_option == True:
 			if brightness_percent <= 100:
 				if brightness_percent > 0:
 					factor = brightness_percent / 100
-					# print(factor*254)
 					selected_light.set_brightness(round(factor * 254))
 				else:
 					error("Could not set brighness")
