@@ -1,0 +1,10 @@
+{
+	"name": "Dutch language pack",
+	"description": "This adds the Dutch language to PyPlace. For version 1.2.",
+	"type": "language_pack",
+	"min-version": "1.2",
+	"expired": false,
+	"downloads": [
+		"https://pyplace.dantenl.com/orders/VpGzi/language.json"
+	]
+}
