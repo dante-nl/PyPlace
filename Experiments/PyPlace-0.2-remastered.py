@@ -14,6 +14,7 @@
 # be as easy to use, so everyone can use it! :D
 
 # Remastered version of the first PyPlace version that is somewhat recognisable and fully functional.
+# Slightly updated, to make sure that main PyPlace files remain unaffected.
 
 # ————————————————————————————
 # Below you can change more advanced settings,
@@ -58,7 +59,7 @@ DoINeedToRun = True
 # This is the version of PyPlace and is
 # absolutely not recommended to change,
 # except for testing purposes.
-Version = 0.21
+Version = 0.22
 
 
 # ————————————————————————————
@@ -99,8 +100,8 @@ class bcolors:
 # For the Replit version:
 # print(f"{bcolors.WARNING}Warning:{bcolors.END} It appears you're running this on the Replit page. Not everything might work properly because of different file names! We recommend downloading PyPlace and running it for yourself.")
 
-if exists("setup.json") == True:
-	with open('setup.json') as SetupFile:
+if exists("setup-0.2.json") == True:
+	with open('setup-0.2.json') as SetupFile:
 		_data = json.load(SetupFile)
 		PyCommand = _data["PythonCommand"]
 
@@ -180,11 +181,11 @@ def UpdateCheck():
 
 
 def ExecuteFile():
-	if exists("applications.json") == False:
+	if exists("applications-0.2.json") == False:
 		print(f"{bcolors.FAIL}Error:{bcolors.END} You do not have any applications installed! You can download them via \"Download a PyPlace app\" on the main menu.")
 		return
 
-	with open('applications.json') as AppsFile:
+	with open('applications-0.2.json') as AppsFile:
 		json_data = json.load(AppsFile)
 
 	if "apps" in json_data == False:
@@ -248,7 +249,7 @@ def DownloadFile():
 				"Please enter the direct URL to a Python file: ")
 			log("Testing URL with RegEx...")
 			RegExResult = re.search(
-				"^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$", URLToPythonFile)
+				r"^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$", URLToPythonFile)
 			if RegExResult:
 				log("The input is a URL, testing for Python file extension...")
 				FileExtensionCheck2 = URLToPythonFile[-3:]
@@ -277,10 +278,10 @@ def DownloadFile():
 
 						FileName = FileName.replace(" ", "-")
 						RegExResult2 = re.search(
-							"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName)
+							r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName)
 						if RegExResult2:
 							FileName = re.sub(
-								"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName)
+								r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName)
 							print(
 								f"{bcolors.WARNING}Warning:{bcolors.END} File name contained illegal characters. The file name is now {FileName}")
 							InvalidAnswer = False
@@ -299,7 +300,7 @@ def DownloadFile():
 
 					open(FileName, 'wb').write(r.content)
 
-					with open('applications.json') as ApplicationsFile:
+					with open('applications-0.2.json') as ApplicationsFile:
 						data2 = json.load(ApplicationsFile)
 
 					data2["apps"].update(
@@ -310,8 +311,8 @@ def DownloadFile():
 							}
 						})
 
-					log("Appending to applications.json")
-					with open("applications.json", 'w') as json_file:
+					log("Appending to applications-0.2.json")
+					with open("applications-0.2.json", 'w') as json_file:
 						json.dump(data2, json_file,
 								indent=4,
 								separators=(',', ': '))
@@ -386,10 +387,10 @@ def DownloadFile():
 
 						FileName1 = FileName1.replace(" ", "-")
 						RegExResult3 = re.search(
-							"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName1)
+							r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName1)
 						if RegExResult3:
 							FileName1 = re.sub(
-								"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName1)
+								r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName1)
 							print(
 								f"{bcolors.WARNING}Warning:{bcolors.END} File name contained illegal characters. The file name is now {FileName1}")
 							InvalidAnswer1 = False
@@ -408,7 +409,7 @@ def DownloadFile():
 
 					open(FileName1, 'wb').write(AppRequest.content)
 
-					with open('applications.json') as ApplicationsFile1:
+					with open('applications-0.2.json') as ApplicationsFile1:
 						data3 = json.load(ApplicationsFile1)
 
 					data3["apps"].update(
@@ -420,8 +421,8 @@ def DownloadFile():
 								"StoreApp": "true"
 							}
 						})
-					log("Appending to applications.json")
-					with open("applications.json", 'w') as json_file:
+					log("Appending to applications-0.2.json")
+					with open("applications-0.2.json", 'w') as json_file:
 						json.dump(data3, json_file,
 								indent=4,
 								separators=(',', ': '))
@@ -442,18 +443,18 @@ def Settings():
 	while NotAnswered == True:
 		Answer = input("Enter the number or letter for what you want to do: ")
 		if Answer == "1":
-			if exists("applications.json") == False:
+			if exists("applications-0.2.json") == False:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} You do not have any applications installed! You can download them via \"Download a PyPlace app\" on the main menu.")
 				return
 
-			with open('applications.json') as AppsFile:
+			with open('applications-0.2.json') as AppsFile:
 				json_data = json.load(AppsFile)
 
 			if "apps" in json_data == False:
 				print(f"{bcolors.FAIL}Error:{bcolors.END} You do not have any applications installed! You can download them via \"Download a PyPlace app\" on the main menu.")
 				return
 
-			log("Reading applications.json...")
+			log("Reading applications-0.2.json...")
 			print(
 				f"Applications colored {bcolors.OKCYAN}cyan{bcolors.END} are downloaded from the PyPlace Store.")
 			ItemCount = 0
@@ -487,27 +488,27 @@ def Settings():
 				log(f"Deleted {json_data['apps'][ItemNeeded]['file_name']}")
 			del json_data["apps"][ItemNeeded]
 
-			with open('applications.json', 'w') as data_file:
+			with open('applications-0.2.json', 'w') as data_file:
 				data = json.dump(json_data, data_file,
 								indent=4,
 								separators=(',', ': '))
 			print(f"{bcolors.OKGREEN}Deleted {AppName}!{bcolors.END}")
 			NotAnswered = False
 		elif Answer == "2":
-			if exists("setup.json") == False:
-				print(f"{bcolors.FAIL}Error:{bcolors.END} You do not have a setup.json file! Please {bcolors.BOLD}restart PyPlace to set it up!{bcolors.END}")
+			if exists("setup-0.2.json") == False:
+				print(f"{bcolors.FAIL}Error:{bcolors.END} You do not have a setup-0.2.json file! Please {bcolors.BOLD}restart PyPlace to set it up!{bcolors.END}")
 				sys.exit(0)
 
 			NewPythonCommand = input(
 				"What do you want the new command to be? Leave empty to set to default (python3). ") or "python3"
 
-			SetupFile = open("setup.json", "r")
+			SetupFile = open("setup-0.2.json", "r")
 			json_object = json.load(SetupFile)
 			SetupFile.close()
 			log(json_object)
 
 			json_object["PythonCommand"] = NewPythonCommand
-			SetupFile = open("setup.json", "w")
+			SetupFile = open("setup-0.2.json", "w")
 			json.dump(json_object, SetupFile)
 			SetupFile.close()
 
@@ -560,7 +561,7 @@ def Settings():
 		elif Answer == "4":
 			# ! Coding here now! (about)
 			NotAnswered = False
-			with open('setup.json') as SetupFile:
+			with open('setup-0.2.json') as SetupFile:
 				data = json.load(SetupFile)
 
 			print(f"""
@@ -571,6 +572,10 @@ def Settings():
 ██║░░░░░░░░██║░░░██║░░░░░███████╗██║░░██║╚█████╔╝███████╗
 ╚═╝░░░░░░░░╚═╝░░░╚═╝░░░░░╚══════╝╚═╝░░╚═╝░╚════╝░╚══════╝
 
+Release notes v0.2.2:
+* All files are now seperate from the main version of PyPlace
+* Fixed invalid escape sequences in RegEx (this error popped up because a newer version of Python)
+		 
 PyPlace is an easy-to-use Python
 application that allows you to open and install
 various Python applications. PyPlace is designed to
@@ -588,7 +593,8 @@ as the old files still exist. So you can actually browse the old store
 as it was back in version 0.6. If you manually enable the updater you
 can also see that it thinks the latest version is 0.6.
 
-Enjoy! -dante_nl, creator of PyPlace.
+Enjoy! 
+-dante_nl, creator of PyPlace.
 
 {bcolors.BOLD}Your version:{bcolors.END} {Version} (remastered)
 {bcolors.BOLD}Your setup version:{bcolors.END} {data["SetupVersion"]}""")
@@ -643,29 +649,29 @@ print("install new ones!")
 print("Welcome to the remastered version! Go to [3] Settings > [4] About to learn more.")
 print()
 
-log("Checking if setup.json exists...")
-if exists("setup.json") == True:
-	log("setup.json exists, launching the regular version of PyPlace...")
-	log("Checking if applications.json exists...")
-	if exists("applications.json") == False:
-		log("applications.json does not exist, creating new file...")
+log("Checking if setup-0.2.json exists...")
+if exists("setup-0.2.json") == True:
+	log("setup-0.2.json exists, launching the regular version of PyPlace...")
+	log("Checking if applications-0.2.json exists...")
+	if exists("applications-0.2.json") == False:
+		log("applications-0.2.json does not exist, creating new file...")
 		AppDict = {
 			"_NOTE": "DO NOT DELETE THIS FILE! This file is crucial for downloading, opening and deleting apps, yet you deleted it :(",
 			"apps": {
 			}
 		}
 
-		with open("applications.json", 'w') as json_file:
+		with open("applications-0.2.json", 'w') as json_file:
 			json.dump(AppDict, json_file,
 					indent=4,
 					separators=(',', ': '))
-		log("applications.json created.")
+		log("applications-0.2.json created.")
 	if CheckForUpdates != False:
 		UpdateCheck()
 	while DoINeedToRun == True:
 		PyPlaceRegular()
 else:
-	log("setup.json does not exist, launching setup...")
+	log("setup-0.2.json does not exist, launching setup...")
 	PythonCommand = input(
 		"What command do you use to run a Python file in your terminal? ") or "python3"
 	print("Leave empty to set it to the default (python3)")
@@ -679,7 +685,7 @@ else:
 		}
 	}
 
-	with open("applications.json", 'w') as json_file:
+	with open("applications-0.2.json", 'w') as json_file:
 		json.dump(AppDict, json_file,
 				indent=4,
 				separators=(',', ': '))
@@ -692,12 +698,12 @@ else:
 	}
 
 	SetupDictStr = json.dumps(SetupDict)
-	with open('setup.json', 'w') as SetupJSON:
+	with open('setup-0.2.json', 'w') as SetupJSON:
 		SetupJSON.write(SetupDictStr)
-		log("File created: setup.json")
+		log("File created: setup-0.2.json")
 
 	print(f"{bcolors.OKGREEN}PyPlace is set up!{bcolors.END}")
-	# Read content of setup.json key
-	# with open('setup.json') as SetupFile:
+	# Read content of setup-0.2.json key
+	# with open('setup-0.2.json') as SetupFile:
 	#     data = json.load(SetupFile)
 	#     print(data["SetupVersion"])
