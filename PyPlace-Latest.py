@@ -28,6 +28,7 @@
 # is doing? This might clutter the output
 # with various small things, such as when
 # a file is created.
+
 DoNotLogOutput = True
 
 # 𝗘𝗻𝗮𝗯𝗹𝗲 𝗼𝗿 𝗱𝗶𝘀𝗮𝗯𝗹𝗲 𝘁𝗵𝗲 𝗺𝗮𝗶𝗻 𝘀𝗰𝗿𝗶𝗽𝘁
@@ -40,18 +41,6 @@ DoNotLogOutput = True
 # NOTE: This should not be touched
 DoINeedToRun = True
 
-# 𝗘𝗻𝗮𝗯𝗹𝗲 𝗼𝗿 𝗱𝗶𝘀𝗮𝗯𝗹𝗲 𝗥𝗲𝗽𝗹𝗶𝘁 𝗺𝗼𝗱𝗲
-# Default: False
-# Possible options: True, False
-
-# This decides whether PyPlace should
-# run like it is being executed from
-# the official Replit page, this
-# disables settings such as updating,
-# ignores file names and gives a 
-# warning each time you run it.
-ReplitMode = False
-
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
 # Default: 1.1 (changes every version)
 # Possible options: any number
@@ -59,7 +48,7 @@ ReplitMode = False
 # This is the version of PyPlace and is
 # absolutely not recommended to change,
 # except for testing purposes.
-Version = 1.1
+Version = 1.2
 
 # 𝗩𝗲𝗿𝘀𝗶𝗼𝗻 𝗹𝗶𝘀𝘁
 # Default: [{Version}] (changes every version)
@@ -70,7 +59,7 @@ Version = 1.1
 # list won't really break PyPlace, it just won't
 # give an error when a wrong translation is added
 
-CompatibleVersionList = [Version, 1.0]
+CompatibleVersionList = [Version]
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿
 # Default: None (changes every Order)
@@ -80,10 +69,10 @@ CompatibleVersionList = [Version, 1.0]
 # if any.
 # PyPlace uses this to get more information
 # about it.
-Order = None
+Order = "gxLkk"
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
-# Default: None (changes every Order versions)
+# Default: 1.0 (changes every Order versions)
 # Possible options: None, any number
 
 # This is the Order that PyPlace is
@@ -92,31 +81,51 @@ Order = None
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = None
+OrderVersion = 1.1
+
+# 𝗦𝗲𝘁𝘂𝗽 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
+# Default: 0.2 (changes when needed, irregularly)
+# Possible option: any number
+
+# This defines what setup version is used
+# and expected. If major configuration changes
+# are needed (and if they *have* to be set at the start)
+# this file version will be updated
+
+SetupVersion = 0.2
 
 # ————————————————————————————
 # Below this line of text, everything
 # that is needed in PyPlace is imported.
 # It is absolutely NOT recommended to
 # edit this as it can BREAK PyPlace!
-import os
-import re
-import sys
-import json
-import argparse
-import requests
-from os.path import exists
 
+from os.path import exists
+import subprocess
+import requests
+import argparse
+import json
+import sys
+import re
+import os
 
 # ————————————————————————————
 # Below is the main code, it is not
 # recommended to edit it, as it might affect
 # how well PyPlace runs.
 
+try:
+	import replit  # type: ignore
+	ReplitMode = True
+except ModuleNotFoundError:
+	ReplitMode = False
+
+
 REQUEST_HEADERS = {
 	"Cache-Control": "no-cache",
 	"Expires": "0"
 }
+
 
 class bcolors:
 	LOG = '\033[95m'
@@ -129,19 +138,16 @@ class bcolors:
 	BOLD = '\033[1m'
 	UNDERLINE = '\033[4m'
 
+
 if exists("setup.json") == True:
 	with open('setup.json') as SetupFile:
 		SetupFile = json.load(SetupFile)
-		PyCommand = SetupFile["PythonCommand"]
+		# PyCommand = SetupFile["PythonCommand"]
 
-FileName = f"{os.path.splitext(os.path.basename(__file__))[0]}.py"
-FileNameWarning = False
-print(FileName)
+# FileName = f"{os.path.splitext(os.path.basename(__file__))[0]}.py"
+# print(FileName)
 if ReplitMode == True:
 	CheckForUpdates = False
-else:
-	if FileName.lower() != "pyplace.py":
-		FileNameWarning = True
 
 
 def log(message):
@@ -152,12 +158,48 @@ def log(message):
 def error(error_msg):
 	print(f"{bcolors.FAIL}Error:{bcolors.END} {error_msg}")
 
+
 def warn(warning_msg):
 	print(f"{bcolors.WARNING}Warning:{bcolors.END} {warning_msg}")
 
 
 def info(info_msg):
 	print(f"{bcolors.INFO}{info_msg}{bcolors.END}")
+
+def runFile(file_name : str = None, self : bool = False):
+	"""Runs a Python file.
+	
+	Accepts `file_name` or `self` (used to restart PyPlace.) One of them must be true.
+	Returns False if this action failed. Enable logs to get more details.
+	"""
+
+	if bool(file_name) ^ self == False:
+		log("Can not run executeFile(); file_name and self defined or none defined?")
+		return False
+
+	if self:
+		log("Restarting PyPlace")
+		print(language["restart_pyplace"])
+		os.execv(sys.executable, [sys.executable] + sys.argv)
+		sys.exit(0)
+
+	if file_name:
+		print(language["execute_file_message_4"].replace("[app]", file_name))
+
+		FileExtensionCheck = file_name[-3:]
+		if FileExtensionCheck != ".py":
+			print(language["execute_file_error_2"])
+			return
+
+		elif exists(file_name) == True:
+			subprocess.run([sys.executable, file_name])
+			print(language["execute_file_message_5"])
+			input(language["back_to_menu"]+" ")
+
+		else:
+			print(f"{bcolors.FAIL}Error:{bcolors.END} {file_name} does not exist in the current folder.")
+
+
 
 def downloadFromStore(OfficialName, FileName, StoreRequestJSON, Version):
 	"""Download an application from the PyPlace store."""
@@ -167,7 +209,8 @@ def downloadFromStore(OfficialName, FileName, StoreRequestJSON, Version):
 	AppRequest = requests.get(
 		StoreRequestJSON['apps'][OfficialName]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
 	if not AppRequest.ok:
-		print(language["download_file_error_2"].replace("[code]", AppRequest.status_code))
+		print(language["download_file_error_2"].replace(
+		    "[code]", AppRequest.status_code))
 		return
 	else:
 		open(FileName, 'wb').write(AppRequest.content)
@@ -195,6 +238,7 @@ def downloadFromStore(OfficialName, FileName, StoreRequestJSON, Version):
 							indent=4,
 							separators=(',', ': '))
 		log("Updated file")
+
 
 def UpdateCheck():
 	log("Checking for latest version...")
@@ -233,7 +277,7 @@ def UpdateCheck():
 					print(language["update_error_2"].replace("[code]", r.status_code))
 					return
 				log("Updating main PyPlace file")
-				open('PyPlace.py', 'wb').write(r.content)
+				open(sys.argv[0], 'wb').write(r.content)
 				print(language["update_message_6"])
 				NotAnswered2 = True
 				while NotAnswered2 == True:
@@ -241,7 +285,7 @@ def UpdateCheck():
 					Answer2 = Answer2.lower()
 					if Answer2 == "y":
 						print(language['update_message_8'])
-						os.system(f"{PyCommand} PyPlace.py")
+						runFile(self=True)
 						NotAnswered2 = False
 						sys.exit(1)
 					elif Answer2 == "n":
@@ -260,15 +304,15 @@ def UpdateCheck():
 				print(
 					f"{bcolors.FAIL}Error:{bcolors.END} I'm not sure what you mean with \"{Answer}\".")
 
+
 def ExecuteFile():
 	if exists("applications.json") == False:
 		print(language['execute_file_error_1'])
 		return
 
-
 	with open('applications.json') as AppsFile:
 		json_data = json.load(AppsFile)
-	
+
 	if "apps" in json_data == False:
 		print(language['execute_file_error_1'])
 		return
@@ -281,16 +325,18 @@ def ExecuteFile():
 		ItemCount += 1
 		if "StoreApp" in json_data['apps'][item]:
 			if json_data['apps'][item]["StoreApp"] == "true":
-				print(f"{bcolors.OKCYAN}[{ItemCount}] {json_data['apps'][item]['name']} by {json_data['apps'][item]['author']}{bcolors.END}")
+				print(
+				    f"{bcolors.OKCYAN}[{ItemCount}] {json_data['apps'][item]['name']} by {json_data['apps'][item]['author']}{bcolors.END}")
 		elif "experiment" in json_data['apps'][item]:
 			if json_data['apps'][item]["experiment"] == "true":
-				print(f"{bcolors.WARNING}[{ItemCount}] {json_data['apps'][item]['name']}{bcolors.END}")
+				print(
+				    f"{bcolors.WARNING}[{ItemCount}] {json_data['apps'][item]['name']}{bcolors.END}")
 		else:
 			if "author" in json_data['apps'][item]:
 				print(f"[{ItemCount}] {json_data['apps'][item]['name']} by {json_data['apps'][item]['author']}")
 			else:
 				print(f"[{ItemCount}] {json_data['apps'][item]['name']}")
-	
+
 	if ItemCount == 0:
 		print(language["execute_file_error_1"])
 		return
@@ -302,21 +348,43 @@ def ExecuteFile():
 	for item in json_data["apps"]:
 		ItemCount2 += 1
 		if str(ItemCount2) == str(NumberAppNeeded):
-			print(language["execute_file_message_4"].replace("[app]", json_data["apps"][item]["file_name"]))
+			runFile(json_data['apps'][item]['file_name'])
+			
 
-			FileExtensionCheck = str(json_data['apps'][item]['file_name'])[-3:]
-			if FileExtensionCheck != ".py":
-				print(language["execute_file_error_2"])
-				return
 
-			elif exists(f"{json_data['apps'][item]['file_name']}") == True:
-				os.system(f"{PyCommand} {json_data['apps'][item]['file_name']}")
-				print(language["execute_file_message_5"])
-				input(language["back_to_menu"]+" ")
+def quickstart_download(OfficialName, FileName, StoreRequestJSON):
+	"""For Quickstart: Download an application from the PyPlace store."""
+	Name = StoreRequestJSON["apps"][OfficialName]["name"]
+	Author = StoreRequestJSON["apps"][OfficialName]["author"]
+	print(language["quickstart_message_1"].replace("[name]", Name))
+	AppRequest = requests.get(
+		StoreRequestJSON['apps'][OfficialName]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
+	if not AppRequest.ok:
+		# print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the file! Response code: {AppRequest.status_code}")
+		print(language["quickstart_error_2"].replace(
+		    "[code]", AppRequest.status_code))
+		return
+	else:
+		open(FileName, 'wb').write(AppRequest.content)
+		with open('applications.json') as ApplicationsFile1:
+				data3 = json.load(ApplicationsFile1)
 
-			else:
-				print(
-					f"{bcolors.FAIL}Error:{bcolors.END} {PyCommand} {json_data['apps'][item]['file_name']} does not exist in the current folder.")
+				data3["apps"].update(
+					{
+						f"{Name} (Quickstart Installed)": {
+							"name": f"{Name}",
+							"file_name": f"{FileName}",
+							"author": f"{Author}",
+							"StoreApp": "true"
+						}
+					})
+				with open("applications.json", 'w') as json_file:
+					json.dump(data3, json_file,
+							indent=4,
+							separators=(',', ': '))
+		print(language["download_file_message_4"])
+		print()
+
 
 def DownloadFile():
 	print(f"""
@@ -336,7 +404,7 @@ def DownloadFile():
 			URLToPythonFile = input(f"{language['download_file_message_2']} ")
 			log("Testing URL with RegEx...")
 			RegExResult = re.search(
-"^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$", 
+r"^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$",
 URLToPythonFile)
 			if RegExResult:
 				log("The input is a URL, testing for Python file extension...")
@@ -356,15 +424,18 @@ URLToPythonFile)
 					print(language["download_file_message_4"])
 					InvalidAnswer = True
 					while InvalidAnswer == True:
-						FileName = input(f"{language['download_file_message_5']} ") or "PyPlace Installed App.py"
+						FileName = input(
+						    f"{language['download_file_message_5']} ") or "PyPlace Installed App.py"
 						FileExtensionCheck3 = FileName[-3:]
 						if FileExtensionCheck3 != ".py":
 							FileName = f"{FileName}.py"
 
 						FileName = FileName.replace(" ", "-")
-						RegExResult2 = re.search("""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName)
+						RegExResult2 = re.search(
+						    r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName)
 						if RegExResult2:
-							FileName = re.sub("""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName)
+							FileName = re.sub(
+							    r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName)
 							print(language["download_file_warning_1"].replace("[name]", FileName))
 							InvalidAnswer = False
 						else:
@@ -373,17 +444,17 @@ URLToPythonFile)
 						if exists(FileName):
 							print(language["download_file_error_3"].replace("name", FileName))
 							InvalidAnswer = True
-						
-					Name = input(f"{language['download_file_message_6']} ") or "PyPlace Installed App"
+
+					Name = input(
+					    f"{language['download_file_message_6']} ") or "PyPlace Installed App"
 
 					print(language["download_file_message_7"])
-
 
 					open(FileName, 'wb').write(r.content)
 
 					with open('applications.json') as ApplicationsFile:
 						data2 = json.load(ApplicationsFile)
-					
+
 					data2["apps"].update(
 					{
 						f"{Name}": {
@@ -394,10 +465,10 @@ URLToPythonFile)
 
 					log("Appending to applications.json")
 					with open("applications.json", 'w') as json_file:
-						json.dump(data2, json_file, 
-											indent=4,  
-											separators=(',',': '))
-					
+						json.dump(data2, json_file,
+											indent=4,
+											separators=(',', ': '))
+
 					print(language["download_file_message_8"])
 					print(language["download_file_message_9"])
 					NotAnswered4 = False
@@ -420,16 +491,15 @@ URLToPythonFile)
 			print(f"[{bcolors.FAIL}c{bcolors.END}] {language['cancel']}")
 			print(f"[{bcolors.INFO}i{bcolors.END}] Interested in putting your project on the store? Enter 'i' for info")
 
-			
 			NumberStoreAppNeeded = input("What number app do you want to download? ")
-			
+
 			if NumberStoreAppNeeded.lower() == "c":
 				return
-			
+
 			if NumberStoreAppNeeded.lower() == "i":
 				print(f"{bcolors.BOLD}{bcolors.INFO}We're currently looking for apps on the store!{bcolors.END}")
 				print("If you have a Python app you would like to put on the store,")
-				print("please message dante_nl#1234 on Discord (you might have to")
+				print("please message @dante_nl on Discord (you might have to")
 				print("friend me first in order to message me) if you are interested!")
 				input("Enter any text to continue: ")
 
@@ -438,29 +508,32 @@ URLToPythonFile)
 				ItemCount += 1
 				if str(ItemCount) == str(NumberStoreAppNeeded):
 					Author = StoreRequestJSON['apps'][item]['author']
-					print(f"{bcolors.INFO}Attempting to download {StoreRequestJSON['apps'][item]['name']}...{bcolors.END}")
+					print(
+					    f"{bcolors.INFO}Attempting to download {StoreRequestJSON['apps'][item]['name']}...{bcolors.END}")
 					log(f"Retrieving file from {StoreRequestJSON['apps'][item]['url']}...")
 
 					AppRequest = requests.get(
 						StoreRequestJSON['apps'][item]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
 					if not AppRequest.ok:
-						print(language["download_file_error_2"].replace("[code]", AppRequest.status_code))
+						print(language["download_file_error_2"].replace(
+						    "[code]", AppRequest.status_code))
 						return
 					print(language["download_file_message_4"])
 
 					InvalidAnswer1 = True
 					while InvalidAnswer1 == True:
-						FileName1 = input(f"{language['download_file_message_5']} ") or "PyPlace Installed Store App.py"
+						FileName1 = input(
+						    f"{language['download_file_message_5']} ") or "PyPlace Installed Store App.py"
 						FileExtensionCheck4 = FileName1[-3:]
 						if FileExtensionCheck4 != ".py":
 							FileName1 = f"{FileName1}.py"
 
 						FileName1 = FileName1.replace(" ", "-")
 						RegExResult3 = re.search(
-							"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName1)
+							r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName1)
 						if RegExResult3:
 							FileName1 = re.sub(
-								"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName1)
+								r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName1)
 							print(language["download_file_warning_1"].replace("[name]", FileName1))
 							InvalidAnswer1 = False
 						else:
@@ -470,7 +543,7 @@ URLToPythonFile)
 							print(language["download_file_error_3"].replace("[name]", FileName1))
 							InvalidAnswer1 = True
 
-					Name = StoreRequestJSON["apps"][item]["name"]						
+					Name = StoreRequestJSON["apps"][item]["name"]
 
 					print(language["download_file_message_7"])
 
@@ -488,7 +561,7 @@ URLToPythonFile)
 								"StoreApp": "true"
 							}
 						})
-					
+
 					if "version" in StoreRequestJSON["apps"][item]:
 						data3["apps"][Name]["version"] = StoreRequestJSON["apps"][item]["version"]
 
@@ -525,28 +598,31 @@ URLToPythonFile)
 			for item in ExperimentRequestJSON["apps"]:
 				ItemCount += 1
 				if str(ItemCount) == str(NumberExperimentNeeded):
-					log(f"Retrieving file from {ExperimentRequestJSON['apps'][item]['url']}...")
+					log(
+					    f"Retrieving file from {ExperimentRequestJSON['apps'][item]['url']}...")
 
 					AppRequest = requests.get(
 						ExperimentRequestJSON['apps'][item]['url'], allow_redirects=True, headers=REQUEST_HEADERS)
 					if not AppRequest.ok:
-						print(language["download_file_error_2"].replace("[code]", AppRequest.status_code))
+						print(language["download_file_error_2"].replace(
+						    "[code]", AppRequest.status_code))
 						return
 					print(language["download_file_message_4"])
 
 					InvalidAnswer1 = True
 					while InvalidAnswer1 == True:
-						FileName1 = input(f"{language['download_file_message_5']} ") or "PyPlace Installed Experiment.py"
+						FileName1 = input(
+						    f"{language['download_file_message_5']} ") or "PyPlace Installed Experiment.py"
 						FileExtensionCheck4 = FileName1[-3:]
 						if FileExtensionCheck4 != ".py":
 							FileName1 = f"{FileName1}.py"
 
 						FileName1 = FileName1.replace(" ", "-")
 						RegExResult3 = re.search(
-							"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName1)
+							r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName1)
 						if RegExResult3:
 							FileName1 = re.sub(
-								"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName1)
+								r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName1)
 							print(language["download_file_warning_1"].replace("[name]", FileName1))
 							InvalidAnswer1 = False
 						else:
@@ -612,15 +688,15 @@ URLToPythonFile)
 			NotAnswered4 = False
 			return
 
+
 def Settings():
 	print()
 	print(language["main_menu_message_1"])
 	print(f"""
 [1] {language['settings_option_1']}
-[2] {language['settings_option_2']}
-[3] {language['settings_option_3']}
-[4] {language['settings_option_6']}
-[5] {language['settings_option_4']}
+[2] {language['settings_option_3']}
+[3] {language['settings_option_6']}
+[4] {language['settings_option_4']}
 [{bcolors.FAIL}c{bcolors.END}] {language['settings_option_5']}
 """)
 	NotAnswered = True
@@ -648,10 +724,12 @@ def Settings():
 				num_app += 1
 				if "StoreApp" in AppDict["apps"][item]:
 					if AppDict["apps"][item]["StoreApp"] == "true":
-						print(f"{bcolors.OKCYAN}[{num_app}] {AppDict['apps'][item]['name']}{bcolors.END}")
+						print(
+						    f"{bcolors.OKCYAN}[{num_app}] {AppDict['apps'][item]['name']}{bcolors.END}")
 				elif "experiment" in AppDict["apps"][item]:
 					if AppDict["apps"][item]["experiment"] == "true":
-						print(f"{bcolors.WARNING}[{num_app}] {AppDict['apps'][item]['name']}{bcolors.END}")
+						print(
+						    f"{bcolors.WARNING}[{num_app}] {AppDict['apps'][item]['name']}{bcolors.END}")
 				else:
 					print(f"[{num_app}] {AppDict['apps'][item]['name']}")
 
@@ -671,29 +749,6 @@ def Settings():
 
 		elif Answer == "2":
 			if ReplitMode != True:
-				if exists("setup.json") == False:
-					print(f"{bcolors.FAIL}Error:{bcolors.END} You do not have a setup.json file! Please {bcolors.BOLD}restart PyPlace to set it up!{bcolors.END}")
-					sys.exit(0)
-
-				NewPythonCommand = input(f"{language['settings_message_3']} ") or "python3"
-
-				SetupFile = open("setup.json", "r")
-				json_object = json.load(SetupFile)
-				SetupFile.close()
-				log(json_object)
-
-				json_object["PythonCommand"] = NewPythonCommand
-				SetupFile = open("setup.json", "w")
-				json.dump(json_object, SetupFile)
-				SetupFile.close()
-
-				print(language['settings_message_4'].replace("command", NewPythonCommand))
-				NotAnswered = False
-			else:
-				print(language['settings_error_1'])
-
-		elif Answer == "3":
-			if ReplitMode != True:
 				NotAnswered1 = True
 				while NotAnswered1 == True:
 					Answer1 = input(f"{language['settings_message_5']} (y/n) ")
@@ -707,7 +762,7 @@ def Settings():
 							print(language["update_error_2"].replace("[code]", r.status_code))
 							return
 						log("Updating main PyPlace file")
-						open('PyPlace.py', 'wb').write(r.content)
+						open(sys.argv[0], 'wb').write(r.content)
 						print(language['settings_message_7'])
 						NotAnswered2 = True
 						while NotAnswered2 == True:
@@ -716,7 +771,8 @@ def Settings():
 							if Answer2 == "y":
 								print(
 									f"{language['settings_message_9']}")
-								os.system(f"{PyCommand} PyPlace.py")
+								# os.system(f"{PyCommand} PyPlace.py")
+								runFile(self=True)
 								NotAnswered2 = False
 								sys.exit(1)
 							elif Answer2 == "n":
@@ -731,7 +787,7 @@ def Settings():
 			else:
 				print(language['settings_error_1'])
 
-		elif Answer == "4":
+		elif Answer == "3":
 			# Manage updater
 
 			# Code to show enable/disable
@@ -746,17 +802,18 @@ def Settings():
 			except:
 				option_1 = language["settings_updater_option_1_b"]
 
-			print()
-			print(f"""Manage the updater
-
-[1] {option_1}
-[2] {language['settings_updater_option_2']}
-[{bcolors.FAIL}c{bcolors.END}] {language['cancel']}
-			""")
 
 			invalid_answer_options_submenu = True
 			while invalid_answer_options_submenu == True:
-				updater_options_answer = input(f"{language['settings_message_1']}: ").lower()
+				print()
+				print(f"""Manage the updater
+
+	[1] {option_1}
+	[2] {language['settings_updater_option_2']}
+	[{bcolors.FAIL}c{bcolors.END}] {language['cancel']}
+				""")
+				updater_options_answer = input(
+				    f"{language['settings_message_1']}: ").lower()
 				if updater_options_answer == "1":
 					invalid_answer_options_submenu = False
 					try:
@@ -764,14 +821,16 @@ def Settings():
 							# disable updater
 							setupfile["check_for_updates"] = False
 							with open('setup.json', 'w') as data_file:
-								data = json.dump(setupfile, data_file, indent=4, separators=(',', ': '))
+								data = json.dump(setupfile, data_file, indent=4,
+								                 separators=(',', ': '))
 
 							print(language["settings_updater_message_1_b"])
 						else:
 							# enable updater
 							setupfile["check_for_updates"] = True
 							with open('setup.json', 'w') as data_file:
-								data = json.dump(setupfile, data_file, indent=4, separators=(',', ': '))
+								data = json.dump(setupfile, data_file, indent=4,
+								                 separators=(',', ': '))
 
 							print(language["settings_updater_message_1_a"])
 					except:
@@ -781,7 +840,7 @@ def Settings():
 							data = json.dump(setupfile, data_file, indent=4, separators=(',', ': '))
 
 						print(language["settings_updater_message_1_b"])
-				
+
 				elif updater_options_answer == "2":
 					invalid_answer_options_submenu = False
 					print(language["settings_updater_message_2"])
@@ -793,11 +852,7 @@ def Settings():
 				else:
 					print(language["input_error"])
 
-
-
-
-
-		elif Answer == "5":
+		elif Answer == "4":
 			NotAnswered = False
 			with open('setup.json') as SetupFile:
 				data = json.load(SetupFile)
@@ -823,29 +878,9 @@ def Settings():
 
 				try:
 					data["name"]
-				except KeyError:
-					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Invalid order."
-					ExtraLine2 = ""
-
-				try:
 					data["description"]
-				except KeyError:
-					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Invalid order."
-					ExtraLine2 = ""
-
-				try:
 					data["type"]
-				except KeyError:
-					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Invalid order."
-					ExtraLine2 = ""
-
-				try:
 					data["min-version"]
-				except KeyError:
-					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Invalid order."
-					ExtraLine2 = ""
-
-				try:
 					data["downloads"][0]
 				except KeyError:
 					ExtraLine1 = f"\n{bcolors.FAIL}Error:{bcolors.END} Invalid order."
@@ -884,6 +919,7 @@ be as easy to use, so everyone can use it! :D
 		else:
 			print(language['input_error'])
 
+
 def bulk_delete(nums):
 	if exists("applications.json") == False:
 		error("You do not have any applications installed.")
@@ -915,6 +951,7 @@ def bulk_delete(nums):
 	else:
 		print(language['bulk_delete_message_2'].replace("[amount]", str(items)))
 
+
 def ExternalAppUpdater():
 	# Get setup file
 	log("Checking if applications support system")
@@ -922,7 +959,7 @@ def ExternalAppUpdater():
 	with open('applications.json') as AppFile:
 		AppFile = json.load(AppFile)
 		AppFile = AppFile["apps"]
-	
+
 	fails = 0
 	total_apps = 0
 	for key in AppFile:
@@ -933,7 +970,10 @@ def ExternalAppUpdater():
 			except:
 				fails += 1
 
-	StoreRequest = requests.get("https://pyplace.dantenl.com/store.json", allow_redirects=True, headers=REQUEST_HEADERS)
+	log(f"{fails} app(s) do not support the updating system")
+	log("Retrieving store...")
+	StoreRequest = requests.get(
+	    "https://pyplace.dantenl.com/store.json", allow_redirects=True, headers=REQUEST_HEADERS)
 	if not StoreRequest.ok:
 		print(f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the PyPlace store! Response code: {StoreRequest.status_code}")
 		return
@@ -941,11 +981,39 @@ def ExternalAppUpdater():
 	StoreRequestJSON = json.loads(StoreRequestText)["apps"]
 	StoreRequestOriginal = json.loads(StoreRequestText)
 
+	apps_with_updates = []
+
+	if fails >= 1:
+		# print(language["app_updater_error_1"])
+		log("Checking for new compatible apps")
+		# invalid_input = True
+		# while invalid_input == True:
+		# 	check_for_support = input(language["app_updater_message_1"]+" (y/n) ").lower()
+		# 	if check_for_support == "y":
+		# 		invalid_input = False
+		# log("Looking for updates")
+		# found_apps = []
+
+		for app in StoreRequestJSON:
+			for local_app in AppFile:
+				if "StoreApp" in AppFile[local_app] and AppFile[local_app]["StoreApp"] == "true":
+					if "version" not in AppFile[local_app]:
+						log("Maybe an update?")
+						log(AppFile[local_app]["name"])
+						log(StoreRequestJSON[app]["name"])
+						if AppFile[local_app]["name"] == StoreRequestJSON[app]["name"]:
+							log("There is an updated thing.")
+							try:
+								StoreRequestJSON[app]["version"]
+								log(f"Latest version: {StoreRequestJSON[app]['version']}")
+								# found_apps.append(StoreRequestJSON[app]["name"])
+								apps_with_updates.append(StoreRequestJSON[app]["name"])
+								fails -= 1
+							except:
+								pass
 
 	if fails != total_apps:
 		log("Checking for updates...")
-
-		apps_with_updates = []
 		for app in AppFile:
 			for store_app in StoreRequestJSON:
 				if "StoreApp" in AppFile[app] and AppFile[app]["StoreApp"] == "true":
@@ -959,13 +1027,14 @@ def ExternalAppUpdater():
 		else:
 			index = 1
 			for app in apps_with_updates:
-				print(f"{bcolors.OKCYAN}[{index}] {apps_with_updates[index-1]} {bcolors.END}")
+				print(
+				    f"{bcolors.OKCYAN}[{index}] {apps_with_updates[index-1]} {bcolors.END}")
 				index += 1
 
-			invalid_input2 = True 
+			invalid_input2 = True
 			while invalid_input2 == True:
 				update_choice = input(language["app_updater_message_3"]+" (y/n) ").lower()
-				
+
 				if update_choice == "y":
 					invalid_input2 = False
 					for app in apps_with_updates:
@@ -977,75 +1046,13 @@ def ExternalAppUpdater():
 						for local_app in AppFile:
 							if AppFile[local_app]["name"] == app:
 								filename = AppFile[local_app]["file_name"]
-						downloadFromStore(official_name, filename, StoreRequestOriginal, app_version)
+						downloadFromStore(official_name, filename,
+						                  StoreRequestOriginal, app_version)
 				elif update_choice == "n":
 					invalid_input2 = False
 					return
 				else:
 					print(language["input_error"])
-
-	if fails >= 1:
-		print(language["app_updater_error_1"])
-		invalid_input = True
-		while invalid_input == True:
-			check_for_support = input(language["app_updater_message_1"]+" (y/n) ").lower()
-			if check_for_support == "y":
-				invalid_input = False
-
-				log("Looking for updates")
-
-
-				found_apps = []
-
-				for app in StoreRequestJSON:
-					for local_app in AppFile:
-						if "StoreApp" in AppFile[local_app] and AppFile[local_app]["StoreApp"] == "true":
-							if "version" not in AppFile[local_app]:
-						# log(app)
-						# log(len(AppFile[local_app]))
-						# log(AppFile[local_app]["name"])
-						# log(StoreRequestJSON[app]["name"])
-								if AppFile[local_app]["name"] == StoreRequestJSON[app]["name"]:
-									try:
-										StoreRequestJSON[app]["version"]
-										found_apps.append(StoreRequestJSON[app]["name"])
-									except:
-										pass
-				if len(found_apps) == 0:
-					print(language["app_updater_message_2"])
-					return
-				
-				index = 1
-				for app in found_apps:
-					print(f"{bcolors.OKCYAN}[{index}] {found_apps[index-1]} {bcolors.END}")
-					index += 1
-
-				invalid_input2 = True 
-				while invalid_input2 == True:
-					update_choice = input(language["app_updater_message_3"]+" (y/n) ").lower()
-					
-					if update_choice == "y":
-						invalid_input2 = False
-						for app in found_apps:
-							for store_app in StoreRequestJSON:
-								if StoreRequestJSON[store_app]["name"] == app:
-									app_version = StoreRequestJSON[store_app]["version"]
-									print(store_app)
-									print(app)
-									official_name = store_app
-									break
-							for local_app in AppFile:
-								if AppFile[local_app]["name"] == app:
-									filename = AppFile[local_app]["file_name"]
-							downloadFromStore(official_name, filename, StoreRequestOriginal, app_version)
-					elif update_choice == "n":
-						invalid_input2 = False
-						return
-					else:
-						print(language["input_error"])
-
-
-
 
 
 def PyPlaceRegular():
@@ -1146,14 +1153,17 @@ def PyPlaceRegular():
 							r = requests.get(data["downloads"][0],
 							                 allow_redirects=True, headers=REQUEST_HEADERS)
 							if not r.ok:
-								print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
+								print(
+								    f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
 								return
 							print(f"{bcolors.OKGREEN}The Order has been downloaded!")
 							print(f"{bcolors.OKCYAN}Installing the Order{bcolors.END}")
-							open('PyPlace.py', 'wb').write(r.content)
-							print(f"{bcolors.OKGREEN}The Order has been downloaded and installed in {bcolors.BOLD}PyPlace.py!{bcolors.END}")
-							print(f"{bcolors.INFO}Attempting to run PyPlace.py...{bcolors.END}")
-							os.system(f"{PyCommand} PyPlace.py")
+							open(sys.argv[0], 'wb').write(r.content)
+							print(
+							    f"{bcolors.OKGREEN}The Order has been downloaded and installed!{bcolors.END}")
+							print(f"{bcolors.INFO}Attempting to restart...{bcolors.END}")
+							# os.system(f"{PyCommand} PyPlace.py")
+							runFile(self=True)
 							sys.exit(1)
 						elif answer == "n":
 							waiting = False
@@ -1166,26 +1176,28 @@ def PyPlaceRegular():
 
 					waiting = True
 					while waiting == True:
-						answer = input("Would you like to install this language pack? (y/n) ").lower()
+						answer = input(
+						    "Would you like to install this language pack? (y/n) ").lower()
 						if answer == "y":
 							waiting = False
 							print(f"{bcolors.INFO}Downloading language pack...{bcolors.END}")
 							r = requests.get(data["downloads"][0],
 							                 allow_redirects=True, headers=REQUEST_HEADERS)
 							if not r.ok:
-								print(f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
+								print(
+								    f"{bcolors.FAIL}Error:{bcolors.END} Could not get the file! Status code: {r.status_code}")
 								return
 							print(f"{bcolors.OKGREEN}The language pack has been downloaded!")
 							print(f"{bcolors.OKCYAN}Installing the language pack...{bcolors.END}")
 							open('language.json', 'wb').write(r.content)
 							print(f"{bcolors.OKGREEN}The language pack has been downloaded and installed in {bcolors.BOLD}language.json!{bcolors.END}")
-							print(f"{bcolors.INFO}Attempting to run PyPlace.py...{bcolors.END}")
-							os.system(f"{PyCommand} PyPlace.py")
+							print(f"{bcolors.INFO}Attempting to run PyPlace...{bcolors.END}")
+							runFile(self=True)
 							sys.exit(1)
 						elif answer == "n":
 							waiting = False
 							return
-				else: 
+				else:
 					error("Could not identify that type of Order! Perhaps it's for a different version?")
 
 			else:
@@ -1202,19 +1214,17 @@ language = {
 		"input_error": f"{bcolors.FAIL}Error:{bcolors.END} I'm not sure what you mean with that!",
 		"back_to_menu": "Press [ENTER] to return to the main menu.",
 		"cancel": "Cancel",
+		"restart_pyplace": f"{bcolors.WARNING}Restarting Pyplace...{bcolors.END}",
 
 		"intro_1": f"Welcome to {bcolors.BOLD}PyPlace{bcolors.END}",
 		"intro_2": "PyPlace is a Python application that allows you \nto get a simple overview of your other Python \napplications, and it also allows you to easily \ninstall new ones!",
 
-		"replit_warning": f"{bcolors.WARNING}WARNING:{bcolors.END} It appears that you're running this on the Replit page. Not everything might work properly because of different file names! We recommend downloading PyPlace and running it for yourself.",
-		"file_name_warning": f"{bcolors.WARNING}WARNING:{bcolors.END} It appears that you are running this from another file that is not called \"pyplace.py\". \nThis means you can not correctly restore and update PyPlace. We recommend changing it to \"pyplace.py\".",
+		"replit_warning": f"{bcolors.WARNING}WARNING:{bcolors.END} It appears that you're running this on the Replit page. We recommend downloading PyPlace and running it for yourself.",
 
-		"setup_1": "What command do you use to run a Python file in your terminal?",
-		"setup_2": "Leave empty to set it to the default. (python3)",
-		"setup_3": f"{bcolors.BOLD}NOTE: {bcolors.END}You can change this later in the settings.",
 		"setup_4": f"{bcolors.INFO}Setting up PyPlace...{bcolors.END}",
 		"setup_5": f"{bcolors.OKGREEN}PyPlace is set up!{bcolors.END}",
 		"setup_6": "Press [ENTER] to start PyPlace",
+		"setup_7": "Do you want to install some apps to get you started?",
 
 		"main_menu_option_1": "Open a PyPlace app",
 		"main_menu_option_2": "Add a PyPlace app",
@@ -1232,10 +1242,10 @@ language = {
 		"update_message_3": f"Here are the release notes:",
 		"update_message_4": f"Would you like to update right now?",
 		"update_message_5": f"{bcolors.INFO}Downloading the latest version of PyPlace...{bcolors.END}",
-		"update_message_6": f"{bcolors.OKGREEN}The latest version of PyPlace is now ready in {bcolors.BOLD}PyPlace.py!{bcolors.END}",
+		"update_message_6": f"{bcolors.OKGREEN}The latest version of PyPlace is now ready!",
 		"update_message_7": f"Would you like to run it?",
-		"update_message_8": f"{bcolors.INFO}Attempting to run PyPlace.py...{bcolors.END}",
-		"update_message_9": f"Continuing with current version. {bcolors.BOLD}NOTE:{bcolors.END} Next time you start PyPlace.py, it will be on the latest version!",
+		"update_message_8": f"{bcolors.INFO}Attempting to run PyPlace...{bcolors.END}",
+		"update_message_9": f"Continuing with current version. {bcolors.BOLD}NOTE:{bcolors.END} Next time you start PyPlace, it will be on the latest version!",
 
 		"execute_file_error_1": f"{bcolors.FAIL}Error:{bcolors.END} You do not have any applications installed! You can download them via \"Download a PyPlace app\" on the main menu.",
 		"execute_file_error_2": f"{bcolors.FAIL}Error:{bcolors.END} This is not a Python file, and thus can not be executed by PyPlace.",
@@ -1269,7 +1279,6 @@ language = {
 
 		"settings_error_1": f"{bcolors.FAIL}Error:{bcolors.END} This is not available when PyPlace is executed on Replit. {bcolors.BOLD}You can download PyPlace instead{bcolors.END}",
 		"settings_option_1": "Delete an application",
-		"settings_option_2": "Change Python command",
 		"settings_option_3": "Restore to latest version",
 		"settings_option_6": "Manage updater settings",
 		"settings_option_4": "About",
@@ -1280,10 +1289,10 @@ language = {
 		"settings_message_4": "Command updated to [command]!",
 		"settings_message_5": f"Are you sure you want to restore to the latest version published online?",
 		"settings_message_6": f"{bcolors.INFO}Downloading latest version of PyPlace...{bcolors.END}",
-		"settings_message_7": f"{bcolors.OKGREEN}The latest version of PyPlace is now ready in {bcolors.BOLD}PyPlace.py!{bcolors.END}",
+		"settings_message_7": f"{bcolors.OKGREEN}The latest version of PyPlace is now ready!{bcolors.END}",
 		"settings_message_8": f"Would you like to run it?",
-		"settings_message_9": f"{bcolors.INFO}Attempting to run PyPlace.py...{bcolors.END}",
-		"settings_message_10": f"Continuing with current version. {bcolors.BOLD}NOTE: {bcolors.END} Next time you start PyPlace.py, it will be on the latest version!",
+		"settings_message_9": f"{bcolors.INFO}Attempting to run PyPlace...{bcolors.END}",
+		"settings_message_10": f"Continuing with current version. {bcolors.BOLD}NOTE: {bcolors.END} Next time you start PyPlace, it will be on the latest version!",
 		"settings_updater_option_1_a": f"Enable checking for updates",
 		"settings_updater_option_1_b": f"Disable checking for updates",
 		"settings_updater_option_2": f"Check for updates now",
@@ -1300,7 +1309,11 @@ language = {
 		"app_updater_message_1": f"Would you like to check if a newer version might support it?",
 		"app_updater_message_2": f"No apps found. Please check back later",
 		"app_updater_message_3": f"Would you like to update the following app(s) to the latest version?",
-		"app_updater_message_4": f"All apps are on the latest version!"
+		"app_updater_message_4": f"All apps are on the latest version!",
+
+		"quickstart_error_1": f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the store! Response code: [code]",
+		"quickstart_error_2": f"{bcolors.FAIL}Error:{bcolors.END} Could not connect to the file! Response code: [code]",
+		"quickstart_message_1": f"{bcolors.INFO}Attempting to download and install \"[name]\"...{bcolors.END}"
 	}
 
 if exists("language.json"):
@@ -1314,12 +1327,13 @@ if exists("language.json"):
 		if key in language:
 			language[key] = value
 
+
 def downloadFromArguments(url):
 	if url:
 		URLToPythonFile = url
 		log("Testing URL with RegEx...")
 		RegExResult = re.search(
-						"^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$",
+						r"^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$",
 								URLToPythonFile)
 		if RegExResult:
 			log("The input is a URL, testing for Python file extension...")
@@ -1338,7 +1352,8 @@ def downloadFromArguments(url):
 						r = requests.get(URLToPythonFile, allow_redirects=True,
 											headers=REQUEST_HEADERS)
 						if not r.ok:
-							print(language["download_file_error_2"].replace("[code]", r.status_code))
+							print(language["download_file_error_2"].replace(
+							    "[code]", r.status_code))
 							return
 
 						print(language["download_file_message_4"])
@@ -1352,10 +1367,10 @@ def downloadFromArguments(url):
 
 							FileName = FileName.replace(" ", "-")
 							RegExResult2 = re.search(
-								"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName)
+								r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", FileName)
 							if RegExResult2:
 								FileName = re.sub(
-									"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName)
+									r"""\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;|\:|\s""", "-", FileName)
 								print(language["download_file_warning_1"].replace("[name]", FileName))
 								InvalidAnswer = False
 							else:
@@ -1396,6 +1411,7 @@ def downloadFromArguments(url):
 		else:
 			print(language["download_file_error_4"])
 
+
 # Arguments to make installing easier
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
@@ -1412,12 +1428,21 @@ print(language["intro_2"])
 print()
 if ReplitMode == True:
 	print(language["replit_warning"])
-if FileNameWarning == True:
-	print(language["file_name_warning"])
+# if FileNameWarning == True:
+# 	print(language["file_name_warning"])
 
 log("Checking if setup.json exists...")
 if exists("setup.json") == True:
-	log("setup.json exists, launching the regular version of PyPlace...")
+	log("Checking if setup is still up to date")
+	with open('setup.json') as SetupFile:
+				data = json.load(SetupFile)
+	setup_version = data["SetupVersion"]
+	if setup_version != SetupVersion:
+		log("Setup version does not match, resetup needed")
+		warn("Setup file outdated, restarting PyPlace to configure again!")
+		os.remove("setup.json")
+		runFile(self=True)
+	
 	log("Checking if applications.json exists...")
 	if exists("applications.json") == False:
 		log("applications.json does not exist, creating new file...")
@@ -1447,29 +1472,18 @@ if exists("setup.json") == True:
 
 else:
 	log("setup.json does not exist, launching setup...")
-	print(language["setup_1"])
-	print(language["setup_2"])
-	print(language["setup_3"])
-	PythonCommand = input("> ") or "python3"
+	# print(language["setup_1"])
+	# print(language["setup_2"])
+	# print(language["setup_3"])
+	# PythonCommand = input("> ") or "python3"
 
 	print(language["setup_4"])
 
-	AppDict = {
-		"_NOTE": "When you delete this file, PyPlace can no longer interact with any downloaded applications.",
-		"apps": {
-		}
-	}
-
-	with open("applications.json", 'w') as json_file:
-		json.dump(AppDict, json_file,
-				indent=4,
-				separators=(',', ': '))
 
 	SetupDict = {
 		"_comment1": "PYPLACE SETUP FILE",
 		"_comment2": "This is an important file for PyPlace, because your settings are stored here! It is NOT recommended to delete or edit this file.",
-		"SetupVersion": 0.1,
-		"PythonCommand": f"{PythonCommand}"
+		"SetupVersion": SetupVersion
 	}
 
 	SetupDictStr = json.dumps(SetupDict, indent=4, separators=(',', ': '))
@@ -1477,8 +1491,50 @@ else:
 		SetupJSON.write(SetupDictStr)
 		log("File created: setup.json")
 
+	if exists("applications.json") == False:
+		AppDict = {
+			"_NOTE": "When you delete this file, PyPlace can no longer interact with any downloaded applications.",
+			"apps": {
+			}
+		}
+		with open("applications.json", 'w') as json_file:
+			json.dump(AppDict, json_file,
+						indent=4,
+						separators=(',', ': '))
+
+		InvalidInput = True
+		while InvalidInput == True:
+			answer = input(f"{language['setup_7']} (y/n) ").lower()
+			if answer == "y":
+				InvalidInput = False
+				StoreRequest = requests.get("http://pyplace.dantenl.com/store.json", allow_redirects=True, headers=REQUEST_HEADERS)
+				if not StoreRequest.ok:
+					print(language["quickstart_error_1"].replace("[code]", StoreRequest.status_code))
+				else:
+					StoreRequestText = StoreRequest.text
+					StoreRequestJSON = json.loads(StoreRequestText)
+
+					quickstart_download("Calculator", "Calculator.py", StoreRequestJSON)
+					quickstart_download("dictiona.py", "dictiona.py", StoreRequestJSON)
+					quickstart_download("Simple Password Gen", "Simple-Password-Generator.py", StoreRequestJSON)
+					quickstart_download("Rock, paper, scissors", "Rock-Paper-Scissors.py", StoreRequestJSON)
+					quickstart_download("Hangman", "Hangman.py", StoreRequestJSON)
+			else:
+				InvalidInput = False
+
 	print(language["setup_5"])
 	input(language["setup_6"])
-	FileName = f"{os.path.splitext(os.path.basename(__file__))[0]}.py"
-	os.system(f"{PythonCommand} {FileName}")
+	runFile(self=True)
 	sys.exit(1)
+
+
+#* Release notes
+# You can join the Discord! https://discord.gg/EXqsHeaXE3
+# - Added Replit detection (for whoever still uses that)
+# - PyPlace Quickstart is now built-in (and thus will be removed from Experiments)
+# - The setup has been changed; you are no longer requested for a Python command
+# - Changed the way scripts are exectuded - please report any bugs on our Discord
+# - Fixed the RegEx strings that were upsetting Python
+
+# - PyPlace AI Translate and Translation Tool have been updated to version 1.2 with the latest strings.
+# - PyPlace v0.21 has been updated to v0.22 to fix the RegEx bug and make sure it uses a seperate setup.json and applications.json (this is because in PyPl v1.2 we changed setup.json). You can download it again in the Experiments tab
