@@ -35,7 +35,7 @@ MODEL = None
 API_URL = None
 # ^ URL to API, usually ends with /v1/chat/completions if it's openai-like
 
-API_KEY = ModuleNotFoundError
+API_KEY = None
 # ^ API key, set to None to ask each time, set to "" to always set it to no key
 # (useful for a local model)
  
