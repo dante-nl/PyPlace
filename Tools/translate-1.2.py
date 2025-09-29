@@ -180,7 +180,6 @@ while invalid_input == True:
 		info("The settings")
 		ask_translation(r"[r]Error:[\] This is not available when PyPlace is executed on Replit. [b]You can download PyPlace instead.[\]", "settings_error_1")
 		ask_translation(r"Delete an application", "settings_option_1")
-		ask_translation(r"Change Python command", "settings_option_2")
 		ask_translation(r"Restore to latest version", "settings_option_3")
 		ask_translation(r"About", "settings_option_4")
 		ask_translation(r"Back to main menu", "settings_option_5")
