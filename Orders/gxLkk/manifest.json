@@ -3,7 +3,7 @@
 	"description": "Upgraded setup process (automatic Python command detection, Quickstart built-in), automatic Replit detection, better updater (automatically adding new files)",
 	"type": "overwrite",
 	"min-version": "0.7",
-	"expired": false,
+	"expired": true,
 	"downloads": [
 		"https://pyplace.dantenl.com/orders/gxLkk/download.py"
 	]
