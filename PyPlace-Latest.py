@@ -69,7 +69,7 @@ CompatibleVersionList = [Version]
 # if any.
 # PyPlace uses this to get more information
 # about it.
-Order = "gxLkk"
+Order = None
 
 # 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗢𝗿𝗱𝗲𝗿 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
 # Default: 1.0 (changes every Order versions)
@@ -81,7 +81,7 @@ Order = "gxLkk"
 # features and are similar to Experiments,
 # however, Orders are directly built in to
 # the PyPlace app.
-OrderVersion = 1.1
+OrderVersion = None
 
 # 𝗦𝗲𝘁𝘂𝗽 𝘃𝗲𝗿𝘀𝗶𝗼𝗻
 # Default: 0.2 (changes when needed, irregularly)
